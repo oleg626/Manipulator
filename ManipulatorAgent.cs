@@ -76,35 +76,35 @@ public class ManipulatorAgent : Agent
         //                 {
         //                     for (float i6 = - pi/3; i6 < pi/3; i6 += discretization)
         //                     {
-                                // float i1 = -pi/2;
-                                // float i2 = 0;
-                                // float i3 = -pi/2;
-                                // float i4 = -pi/3;
-                                // float i5 = -pi/3;
-                                // float i6 = -pi/3;
-                                // float[] angles = {i1, i2, i3, i4, i5, i6};
-                                // position = calcPosition(angles);
-                                // inverse = reverseKinematics(position);
-                                // pos = calcPosition(inverse);
-                                // d1 = Math.Abs(position[0] - pos[0]);
-                                // d2 = Math.Abs(position[1] - pos[1]);
-                                // d3 = Math.Abs(position[2] - pos[2]);
-                                // d4 = Math.Abs(position[3] - pos[3]);
-                                // d5 = Math.Abs(position[4] - pos[4]);
-                                // d6 = Math.Abs(position[5] - pos[5]);
+        //                         // float i1 = -pi/2;
+        //                         // float i2 = 0;
+        //                         // float i3 = -pi/2;
+        //                         // float i4 = -pi/3;
+        //                         // float i5 = -pi/3;
+        //                         // float i6 = -pi/3;
+        //                         float[] angles = {i1, i2, i3, i4, i5, i6};
+        //                         position = calcPosition(angles);
+        //                         inverse = reverseKinematics(position);
+        //                         pos = calcPosition(inverse);
+        //                         d1 = Math.Abs(position[0] - pos[0]);
+        //                         d2 = Math.Abs(position[1] - pos[1]);
+        //                         d3 = Math.Abs(position[2] - pos[2]);
+        //                         d4 = Math.Abs(position[3] - pos[3]);
+        //                         d5 = Math.Abs(position[4] - pos[4]);
+        //                         d6 = Math.Abs(position[5] - pos[5]);
 
-                                // if (d1 > 0.01 || d2 > 0.01 || d3 > 0.01 || d4 > 0.05 || d5 > 0.05 || d6 > 0.05)
-                                // {
-                                //     Debug.Log("ERROR");
-                                //     Debug.Log("input values: " + i1 + "// " + i2 + "//" + i3 + "//" + i4 + "//" + i5 + "//" + i6);
-                                //     Debug.Log("Inverse: " + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
-                                //         + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]);
-                                //     Debug.Log("position: "  + position[0] + "//" + position[1] + "//" + position[2] 
-                                //         + "//" + position[3] + "//" + position[4] + "//" + position[5]);
-                                //     Debug.Log("Second position: " + pos[0] + "//" + pos[1] + "//" + pos[2] 
-                                //         + "//" + pos[3] + "//" + pos[4] + "//" + pos[5]);
-                                //     Debug.Log("Error value: " + d1 + "//" + d2 + "//" + d3 + "//" + d4 + "//" + d5 + "//" + d6);
-                                // }
+        //                         if (d1 > 0.01 || d2 > 0.01 || d3 > 0.01 || d4 > 0.05 || d5 > 0.05 || d6 > 0.05)
+        //                         {
+        //                             Debug.Log("ERROR");
+        //                             Debug.Log("input values: " + i1 + "// " + i2 + "//" + i3 + "//" + i4 + "//" + i5 + "//" + i6);
+        //                             Debug.Log("Inverse: " + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
+        //                                 + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]);
+        //                             Debug.Log("position: "  + position[0] + "//" + position[1] + "//" + position[2] 
+        //                                 + "//" + position[3] + "//" + position[4] + "//" + position[5]);
+        //                             Debug.Log("Second position: " + pos[0] + "//" + pos[1] + "//" + pos[2] 
+        //                                 + "//" + pos[3] + "//" + pos[4] + "//" + pos[5]);
+        //                             Debug.Log("Error value: " + d1 + "//" + d2 + "//" + d3 + "//" + d4 + "//" + d5 + "//" + d6);
+        //                         }
         //                         //Thread.Sleep(5000);
         //                     }
         //                 }
@@ -112,7 +112,7 @@ public class ManipulatorAgent : Agent
         //         }
         //     }
         // }
-        if (this.GetCumulativeReward() < - 500) EndEpisode();
+        //if (this.GetCumulativeReward() < - 500) EndEpisode();
         distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
@@ -655,7 +655,7 @@ public class ManipulatorAgent : Agent
     {
         // Manipulator parameters
         int a2 = 1000;
-        int d1 = 350;
+        int d1 = 550;
         int d4 = 1240;
         int d6 = 320;
 
@@ -664,7 +664,7 @@ public class ManipulatorAgent : Agent
         double bPow2, cPow2, a, b, c, alfa, beta;
         float  t1, t2, t3;
         x = coordinates[0];//real x
-        y = coordinates[1];//real z
+        y = -coordinates[1];//real z
         z = coordinates[2];//real y
 
 
@@ -851,7 +851,7 @@ public class ManipulatorAgent : Agent
         t4 = angles[3];
         t5 = angles[4];
         t6 = angles[5];
-        float d1 = 350;
+        float d1 = 550;
         float a2 = 1000;
         float d4 = 1240;
         float d6 = 320;
