@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
@@ -22,12 +22,6 @@ public class ManipulatorAgent : Agent
     public float end_min = 1;
     public float end_max =  60;
     public float zone_radius = 750;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //target.transform.position = new Vector3(UnityEngine.Random.value * 500 + 750, 100, 250 );
-    }
 
     private float lastDistTarget1ToZone = 1000000;
     private float lastDistTarget2ToZone = 1000000;
@@ -55,14 +49,14 @@ public class ManipulatorAgent : Agent
 
     private void Update()
     {
-        float discretization = (float) Math.PI / 3;
-        float[] position = new float[6];
-        float[] inverse = new float[6];
-        float[] pos = new float[6];
-        //float[] angles = new float[6];
-        float pi = (float) Math.PI;
-        float d1, d2, d3, d4, d5, d6;
-        Vector3 p4 = part4.transform.position;
+        // float discretization = (float) Math.PI / 3;
+        // float[] position = new float[6];
+        // float[] inverse = new float[6];
+        // float[] pos = new float[6];
+        // //float[] angles = new float[6];
+        // float pi = (float) Math.PI;
+        // float d1, d2, d3, d4, d5, d6;
+        // Vector3 p4 = part4.transform.position;
         //Debug.Log("x: " + p4[0] + "//y:" + p4[1] + "//z:" + p4[2]);
         // for (float i1 = - pi/2; i1 < pi/2; i1 += discretization)
         // {
@@ -112,7 +106,7 @@ public class ManipulatorAgent : Agent
         //         }
         //     }
         // }
-        //if (this.GetCumulativeReward() < - 500) EndEpisode();
+        if (this.GetCumulativeReward() < - 1000) EndEpisode();
         distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
@@ -158,11 +152,11 @@ public class ManipulatorAgent : Agent
         {
             if (distTargetToZone > lastDistTargetToZone)
             {
-                AddReward(0.2f);
+                AddReward(0.5f);
             }
             else
             {
-                AddReward(-0.2f);
+                AddReward(-0.5f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
@@ -180,66 +174,68 @@ public class ManipulatorAgent : Agent
         {
             if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1)
             {
-                AddReward(0.1f);
+                AddReward(0.2f);
             }
             else
             {
-                AddReward(-0.1f);
+                AddReward(-0.2f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
         //2222222222222222222222222222222222
-        if (distTarget2ToZone < zone_radius)
-        {
-            if (distEndEffectorToTarget2 < lastDistEndEffectorToTarget2)
-            {
-                AddReward(0.1f);
-            }
-            else
-            {
-                AddReward(-0.1f);
-            }
-            lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
-        }
-        //3333333333333333333333333333333333
-        if (distTarget3ToZone < zone_radius)
-        {
-            if (distEndEffectorToTarget3 < lastDistEndEffectorToTarget3)
-            {
-                AddReward(0.1f);
-            }
-            else
-            {
-                AddReward(-0.1f);
-            }
-            lastDistEndEffectorToTarget3 = distEndEffectorToTarget3;
-        }
-        //444444444444444444444444444444444
-        if (distTarget4ToZone < zone_radius)
-        {
-            if (distEndEffectorToTarget4 < lastDistEndEffectorToTarget4)
-            {
-                AddReward(0.1f);
-            }
-            else
-            {
-                AddReward(-0.1f);
-            }
-            lastDistEndEffectorToTarget4 = distEndEffectorToTarget4;
-        }
-        //5555555555555555555555555555555
-        if (distTarget5ToZone < zone_radius)
-        {
-            if (distEndEffectorToTarget5 < lastDistEndEffectorToTarget5)
-            {
-                AddReward(0.1f);
-            }
-            else
-            {
-                AddReward(-0.1f);
-            }
-            lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
-        }
+        // if (distTarget2ToZone < zone_radius)
+        // {
+        //     if (distEndEffectorToTarget2 < lastDistEndEffectorToTarget2)
+        //     {
+        //         AddReward(0.1f);
+        //     }
+        //     else
+        //     {
+        //         AddReward(-0.1f);
+        //     }
+        //     lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
+        // }
+        // //3333333333333333333333333333333333
+        // if (distTarget3ToZone < zone_radius)
+        // {
+        //     if (distEndEffectorToTarget3 < lastDistEndEffectorToTarget3)
+        //     {
+        //         AddReward(0.1f);
+        //     }
+        //     else
+        //     {
+        //         AddReward(-0.1f);
+        //     }
+        //     lastDistEndEffectorToTarget3 = distEndEffectorToTarget3;
+        // }
+        // //444444444444444444444444444444444
+        // if (distTarget4ToZone < zone_radius)
+        // {
+        //     if (distEndEffectorToTarget4 < lastDistEndEffectorToTarget4)
+        //     {
+        //         AddReward(0.1f);
+        //     }
+        //     else
+        //     {
+        //         AddReward(-0.1f);
+        //     }
+        //     lastDistEndEffectorToTarget4 = distEndEffectorToTarget4;
+        // }
+        // //5555555555555555555555555555555
+        // if (distTarget5ToZone < zone_radius)
+        // {
+        //     if (distEndEffectorToTarget5 < lastDistEndEffectorToTarget5)
+        //     {
+        //         AddReward(0.1f);
+        //     }
+        //     else
+        //     {
+        //         AddReward(-0.1f);
+        //     }
+        //     lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
+        // }
+
+
         //Debug.Log(part6.transform.position[1]);
         if (part6.transform.position[1] < 150)
         {
@@ -267,6 +263,13 @@ public class ManipulatorAgent : Agent
             AddReward(-200f);
             EndEpisode();
         }
+
+        if (target1.transform.position[1] < 90)
+        {
+            //Debug.Log("part 3 low");
+            AddReward(-200f);
+            EndEpisode();
+        }
         
     }
 
@@ -284,13 +287,6 @@ public class ManipulatorAgent : Agent
         sensor.AddObservation(zone_radius);
     }
 
-    // private float part1_speed = 1;
-    // private float part2_speed = 1;
-    // private float part3_speed = 1;
-    // private float part4_speed = 1;
-    // private float part5_speed = 1;
-    // private float part6_speed = 1;
-
     private float phi1 = 0;
     private float phi2 = 0;
     private float phi3 = 0;
@@ -302,27 +298,54 @@ public class ManipulatorAgent : Agent
 
     public override void OnActionReceived(float[] vectorAction)
     {
-
-        //Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
+        // float[] tpos = {target1.transform.position[0], target1.transform.position[2], 900, 0, 0, (float) Math.PI};
+        // float[] inverse = reverseKinematics(tpos);
+        // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
+        //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
+        // Debug.Log("inverse: "  + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
+        //                                  + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]);
+        // phi1 = inverse[0];
+        // phi2 = inverse[1];
+        // phi3 = inverse[2];
+        // phi4 = inverse[3];
+        // phi5 = inverse[4];
+        // phi6 = inverse[5];
+        // phi61 = 0;
+        // phi62 = 0;
+        // float[] p4_pos = calcPosition(inverse);
+        // Debug.Log("position: "  + p4_pos[0] + "//" + p4_pos[1] + "//" + p4_pos[2] 
+        //                                  + "//" + p4_pos[3] + "//" + p4_pos[4] + "//" + p4_pos[5]);
+        // //Debug.Log("Episode Begin");
+        // part1.transform.localRotation = Quaternion.Euler(0, radToDegree(phi1), 0);
+        // part2.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi2));
+        // part3.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi3));
+        // part4.transform.localRotation = Quaternion.Euler(radToDegree(phi4), 0, 0);
+        // part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi5));
+        // part6.transform.localRotation = Quaternion.Euler(radToDegree(phi6), 0, 0);
+        // part61.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        // part62.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
         float x, z, y, rad_x, rad_y, rad_z, grab;
         x = vectorAction[0] * 3000;
         y = vectorAction[1] * 3000;
         z = vectorAction[2] * 3000;
-        x = 1500;
-        y = 1000;
-        z = 500;
         rad_z = vectorAction[3] * (float)(2 * Math.PI);
         rad_y = vectorAction[4] * (float)(2 * Math.PI);
         rad_x = vectorAction[5] * (float)(2 * Math.PI);
+
         //Debug.Log("x: " + (int)x + " z: " + (int)y + " y: " + (int)z + " rz: " + Math.Round(rad_z, 2) + " ry: " + Math.Round(rad_y, 2) + " rx: " + Math.Round(rad_x, 2));
         grab = vectorAction[6];
         bool doGrab = grab > 0.5;
 
-        float[] coordinates = {1500, 500, 1000, 0, 0, 0};   
+        float[] coordinates = {x, z, y, rad_z, rad_y, rad_x};   
         float[] angles = reverseKinematics(coordinates);
-        Debug.Log("inverse: " + angles[0] + "//1:" + angles[1] + "//2:" + angles[2] + "//3:" + angles[3] + "//4:" + angles[4] + "//5:" + angles[5]);
+        // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
+        //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
+        // Debug.Log("angles: "  + angles[0] + "//" + angles[1] + "//" + angles[2] 
+        //                                  + "//" + angles[3] + "//" + angles[4] + "//" + angles[5]);
+        // Debug.Log("inverse: " + angles[0] + "//1:" + angles[1] + "//2:" + angles[2] + "//3:" + angles[3] + "//4:" + angles[4] + "//5:" + angles[5]);
         float[] p4pos = calcPosition(angles);
-        Debug.Log("pos x: " + p4pos[0] + "//z:" + p4pos[1] + "//y:" + p4pos[2] + "//rz:" + p4pos[3] + "//ry:" + p4pos[4] + "//rx:" + p4pos[5]);
+        //Debug.Log("pos x: " + p4pos[0] + "//z:" + p4pos[1] + "//y:" + p4pos[2] + "//rz:" + p4pos[3] + "//ry:" + p4pos[4] + "//rx:" + p4pos[5]);
         float target_phi1 = radToDegree(angles[0]);
         float target_phi2 = radToDegree(angles[1]);
         float target_phi3 = radToDegree(angles[2]);
@@ -380,6 +403,7 @@ public class ManipulatorAgent : Agent
 
         /*******************phi 2**********************/
         diff = target_phi2 - phi2;
+        //Debug.Log("phi2 before:" + phi2);
         if (diff > 1)
         {
             phi2 += speed;
@@ -389,6 +413,7 @@ public class ManipulatorAgent : Agent
             phi2 -= speed;
         }
         phi2 = normalizeAngle(phi2);
+
         part2.transform.localRotation = Quaternion.Euler(0, 0, phi2); 
 
         /*******************phi 3**********************/
@@ -489,88 +514,92 @@ public class ManipulatorAgent : Agent
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
         //22222222222222222222222222
-        if (useTarget2)
-        {
-            Vector3 pos = zone.transform.position;
-            pos[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-            pos[1] += 102;
-            pos[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-            target2.transform.position = pos;
-            target2.transform.localRotation = Quaternion.identity;
-        }
-        else
-        {
-            target2.transform.position = new Vector3(3300, 102, 0);
-        }
-        target2.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        target2.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        //333333333333333333333333333333
-        if (useTarget3)
-        {
-            Vector3 pos = zone.transform.position;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            pos[1] += 102;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            target3.transform.position = pos;
-        }
-        else
-        {
-            target3.transform.position = new Vector3(3600, 102, 0);
-        }
-        target3.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        target3.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        //444444444444444444444444444444444
-        if (useTarget4)
-        {
-            Vector3 pos = zone.transform.position;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            pos[1] += 102;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            target4.transform.position = pos;
-        }
-        else
-        {
-            target4.transform.position = new Vector3(3900, 102, 0);
-        }
-        target4.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        target4.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        //555555555555555555555555555555
-        if (useTarget5)
-        {
-            Vector3 pos = zone.transform.position;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            pos[1] += 102;
-            pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-            target5.transform.position = pos;
-        }
-        else
-        {
-            target5.transform.position = new Vector3(4200, 200, 0);
-        }
-        target5.GetComponent<Rigidbody>().velocity = Vector3.zero;  
-        target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        float[] tpos = {target1.transform.position[0], target1.transform.position[1] + 300, target1.transform.position[2], 0, 0, 0};
+        // if (useTarget2)
+        // {
+        //     Vector3 pos = zone.transform.position;
+        //     pos[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        //     pos[1] += 102;
+        //     pos[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        //     target2.transform.position = pos;
+        //     target2.transform.localRotation = Quaternion.identity;
+        // }
+        // else
+        // {
+        //     target2.transform.position = new Vector3(3300, 102, 0);
+        // }
+        // target2.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        // target2.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        // //333333333333333333333333333333
+        // if (useTarget3)
+        // {
+        //     Vector3 pos = zone.transform.position;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     pos[1] += 102;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     target3.transform.position = pos;
+        // }
+        // else
+        // {
+        //     target3.transform.position = new Vector3(3600, 102, 0);
+        // }
+        // target3.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        // target3.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        // //444444444444444444444444444444444
+        // if (useTarget4)
+        // {
+        //     Vector3 pos = zone.transform.position;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     pos[1] += 102;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     target4.transform.position = pos;
+        // }
+        // else
+        // {
+        //     target4.transform.position = new Vector3(3900, 102, 0);
+        // }
+        // target4.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        // target4.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        // //555555555555555555555555555555
+        // if (useTarget5)
+        // {
+        //     Vector3 pos = zone.transform.position;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     pos[1] += 102;
+        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
+        //     target5.transform.position = pos;
+        // }
+        // else
+        // {
+        //     target5.transform.position = new Vector3(4200, 102, 0);
+        // }
+        // target5.GetComponent<Rigidbody>().velocity = Vector3.zero;  
+        // target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+
+
+        float[] tpos = {target1.transform.position[0], target1.transform.position[2], 750, 0, 0, (float) Math.PI};
         float[] inverse = reverseKinematics(tpos);
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
         //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
-        phi1 = inverse[0];
-        phi2 = inverse[1];
-        phi3 = inverse[2];
-        phi4 = inverse[3];
-        phi5 = inverse[4];
-        phi6 = inverse[5];
+        phi1 = radToDegree(inverse[0]);
+        phi2 = radToDegree(inverse[1]);
+        phi3 = radToDegree(inverse[2]);
+        phi4 = radToDegree(inverse[3]);
+        phi5 = radToDegree(inverse[4]);
+        phi6 = radToDegree(inverse[5]);
         phi61 = 0;
         phi62 = 0;
-        float[] p6_pos = calcPosition(inverse);
+        //float[] p6_pos = calcPosition(inverse);
+        // Debug.Log("inverse: "  + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
+        //                                  + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]);
         // Debug.Log("position: "  + p6_pos[0] + "//" + p6_pos[1] + "//" + p6_pos[2] 
         //                                 + "//" + p6_pos[3] + "//" + p6_pos[4] + "//" + p6_pos[5]);
         ////Debug.Log("Episode Begin");
-        part1.transform.localRotation = Quaternion.Euler(0, radToDegree(phi1), 0);
-        part2.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi2));
-        part3.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi3));
-        part4.transform.localRotation = Quaternion.Euler(radToDegree(phi4), 0, 0);
-        part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(phi5));
-        part6.transform.localRotation = Quaternion.Euler(radToDegree(phi6), 0, 0);
+        part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);
+        part2.transform.localRotation = Quaternion.Euler(0, 0, phi2);
+        part3.transform.localRotation = Quaternion.Euler(0, 0, phi3);
+        part4.transform.localRotation = Quaternion.Euler(phi4, 0, 0);
+        part5.transform.localRotation = Quaternion.Euler(0, 0, phi5);
+        part6.transform.localRotation = Quaternion.Euler(phi6, 0, 0);
         part61.transform.localRotation = Quaternion.Euler(0, 0, 0);
         part62.transform.localRotation = Quaternion.Euler(0, 0, 0);
     }
@@ -693,7 +722,7 @@ public class ManipulatorAgent : Agent
             phi3 = Math.Atan2(Math.Sqrt(1 - Math.Pow(cosphi3, 2)), cosphi3);
         }
             
-        if (z < d1)
+        if (phi3 > 0)
         {
             phi3 = -phi3;
         }
@@ -704,7 +733,7 @@ public class ManipulatorAgent : Agent
 
         double cosbeta = Math.Abs((Math.Pow(d4, 2) - Math.Pow(a, 2) - Math.Pow(a2, 2))/(2 * a * a2));
         beta = Math.Acos(cosbeta);
-        if (y < d1)
+        if (z < d1)
         {
             phi2 = beta - alfa;
         }
@@ -828,14 +857,14 @@ public class ManipulatorAgent : Agent
         }
         else
         {
-            phi5 =Math.Atan2(Math.Sqrt(1 - Math.Pow(A36[2, 2], 2)), A36[2, 2]);
+            phi5 = Math.Atan2(Math.Sqrt(1 - Math.Pow(A36[2, 2], 2)), A36[2, 2]);
         }
         phi4 = Math.Atan2(A36[1, 2], A36[0, 2]);
         phi6 = Math.Atan2(A36[2, 1], -A36[2, 0]);
 
         angles[3] = (float)phi4;
         angles[4] = (float)phi5;
-        angles[5] = (float)phi6;
+        angles[5] = -(float)phi6;
 
         return angles;
     }
@@ -908,13 +937,10 @@ public class ManipulatorAgent : Agent
 
         R1 = A06;
         res = A04 * R;
-        coordinates[0] = res.m03;
-        coordinates[1] = res.m13;
-        coordinates[2] = res.m23;
+        coordinates[0] =  res.m03;
+        coordinates[1] = -res.m13;
+        coordinates[2] =  res.m23;
 
-
-        // coordinates[1] = res.m23;
-        // coordinates[2] = res.m13;
         float sy = (float)Math.Sqrt(Math.Pow(R1.m00, 2) + Math.Pow(R1.m10, 2));
 
         bool singular = sy < 0.000001;
