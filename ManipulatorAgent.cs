@@ -106,7 +106,7 @@ public class ManipulatorAgent : Agent
         //         }
         //     }
         // }
-        if (this.GetCumulativeReward() < - 1000) EndEpisode();
+        if (this.GetCumulativeReward() < - 500) EndEpisode();
         distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
@@ -152,17 +152,17 @@ public class ManipulatorAgent : Agent
         {
             if (distTargetToZone > lastDistTargetToZone)
             {
-                AddReward(0.5f);
+                AddReward(0.2f);
             }
             else
             {
-                AddReward(-0.5f);
+                AddReward(-0.2f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
         else if (lastDistTargetToZone < zone_radius)
         {
-            AddReward(50f);
+            AddReward(100f);
             lastDistTargetToZone = distTargetToZone;
         }
         return lastDistTargetToZone;
@@ -174,11 +174,11 @@ public class ManipulatorAgent : Agent
         {
             if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1)
             {
-                AddReward(0.2f);
+                AddReward(0.1f);
             }
             else
             {
-                AddReward(-0.2f);
+                AddReward(-0.1f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
@@ -298,6 +298,18 @@ public class ManipulatorAgent : Agent
 
     public override void OnActionReceived(float[] vectorAction)
     {
+        if (float.IsNaN(vectorAction[0])||
+            float.IsNaN(vectorAction[1])||
+            float.IsNaN(vectorAction[2])||
+            float.IsNaN(vectorAction[3])||
+            float.IsNaN(vectorAction[4])||
+            float.IsNaN(vectorAction[5]))
+        {
+            //EndEpisode();
+            phi1 = normalizeAngle(++phi1);
+            part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);     
+
+        }
         // float[] tpos = {target1.transform.position[0], target1.transform.position[2], 900, 0, 0, (float) Math.PI};
         // float[] inverse = reverseKinematics(tpos);
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
@@ -324,7 +336,7 @@ public class ManipulatorAgent : Agent
         // part6.transform.localRotation = Quaternion.Euler(radToDegree(phi6), 0, 0);
         // part61.transform.localRotation = Quaternion.Euler(0, 0, 0);
         // part62.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
+        //Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
         float x, z, y, rad_x, rad_y, rad_z, grab;
         x = vectorAction[0] * 3000;
         y = vectorAction[1] * 3000;
@@ -497,19 +509,19 @@ public class ManipulatorAgent : Agent
     {
 
         //11111111111111111111111111
-        if (useTarget1)
-        {
-            Vector3 pos = zone.transform.position;
-            pos[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-            pos[1] += 102;
-            pos[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-            target1.transform.position = new Vector3(pos[0], pos[1], pos[2]);
-            target1.transform.localRotation = Quaternion.identity;
-        }
-        else
-        {
-            target1.transform.position = new Vector3(3000, 102, 0);
-        }
+        // if (useTarget1)
+        // {
+        //     Vector3 pos = zone.transform.position;
+        //     pos[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        //     pos[1] += 102;
+        //     pos[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        //     target1.transform.position = new Vector3(pos[0], pos[1], pos[2]);
+        //     target1.transform.localRotation = Quaternion.identity;
+        // }
+        // else
+        // {
+        target1.transform.position = new Vector3(1500, 102, 200);
+        //}
         target1.GetComponent<Rigidbody>().velocity = Vector3.zero;
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
