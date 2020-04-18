@@ -134,7 +134,7 @@ public class ManipulatorAgent : Agent
             lastDistTarget5ToZone > zone_radius)
         {
             //Debug.Log("Episode end");
-            AddReward(100f);
+            AddReward(1f);
             EndEpisode();
         }
 
@@ -152,17 +152,17 @@ public class ManipulatorAgent : Agent
         {
             if (distTargetToZone > lastDistTargetToZone)
             {
-                AddReward(0.2f);
+                AddReward(0.05f);
             }
             else
             {
-                AddReward(-0.2f);
+                AddReward(-0.05f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
         else if (lastDistTargetToZone < zone_radius)
         {
-            AddReward(100f);
+            AddReward(1f);
             lastDistTargetToZone = distTargetToZone;
         }
         return lastDistTargetToZone;
@@ -174,11 +174,11 @@ public class ManipulatorAgent : Agent
         {
             if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1)
             {
-                AddReward(0.1f);
+                AddReward(0.01f);
             }
             else
             {
-                AddReward(-0.1f);
+                AddReward(-0.01f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
@@ -241,33 +241,33 @@ public class ManipulatorAgent : Agent
         {
             //Debug.Log("part 6 low");
             //Debug.Log(part6.transform.position[1]);
-            AddReward(-200f);
+            AddReward(-1f);
             EndEpisode();
         }
         if (part5.transform.position[1] < 100)
         {
             //Debug.Log("part 5 low");
-            AddReward(-200f);
+            AddReward(-1f);
             EndEpisode();
         }
 
         if (part4.transform.position[1] < 100)
         {
             //Debug.Log("part 4 low");
-            AddReward(-200f);
+            AddReward(-1f);
             EndEpisode();
         }
         if (part3.transform.position[1] < 100)
         {
             //Debug.Log("part 3 low");
-            AddReward(-200f);
+            AddReward(-1f);
             EndEpisode();
         }
 
         if (target1.transform.position[1] < 90)
         {
             //Debug.Log("part 3 low");
-            AddReward(-200f);
+            AddReward(-1f);
             EndEpisode();
         }
         
@@ -276,11 +276,14 @@ public class ManipulatorAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        float maxTargetRadius = 3000f;
         Vector3 target1FromPart1Position = new Vector3(
                                          target1.transform.position[0] - part1.transform.position[0],
                                          target1.transform.position[1] - part1.transform.position[1],
                                          target1.transform.position[2] - part1.transform.position[2]);
-        sensor.AddObservation(target1FromPart1Position);
+        sensor.AddObservation(target1FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target1FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target1FromPart1Position[2]/maxTargetRadius);
         // sensor.AddObservation(target2.transform.position);
         // sensor.AddObservation(target3.transform.position);
         // sensor.AddObservation(target4.transform.position);
@@ -290,15 +293,19 @@ public class ManipulatorAgent : Agent
                                        part6.transform.position[0] - part1.transform.position[0],
                                        part6.transform.position[1] - part1.transform.position[1],
                                        part6.transform.position[2] - part1.transform.position[2]);
-        sensor.AddObservation(part6FromPart1Position);
+        sensor.AddObservation(part6FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(part6FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(part6FromPart1Position[2]/maxTargetRadius);
         sensor.AddObservation(part61.transform.rotation[2]);
         //sensor.AddObservation(part6.transform.rotation);
         Vector3 zoneFromPart1Position = new Vector3(
                                       zone.transform.position[0] - part1.transform.position[0],
                                       zone.transform.position[1] - part1.transform.position[1],
                                       zone.transform.position[2] - part1.transform.position[2]);
-        sensor.AddObservation(zoneFromPart1Position);
-        sensor.AddObservation(zone_radius);
+        sensor.AddObservation(zoneFromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(zoneFromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(zoneFromPart1Position[2]/maxTargetRadius);
+        sensor.AddObservation(zone_radius/1000);
     }
 
     private float phi1 = 0;
