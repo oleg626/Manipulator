@@ -106,7 +106,7 @@ public class ManipulatorAgent : Agent
         //         }
         //     }
         // }
-        if (this.GetCumulativeReward() < - 500) EndEpisode();
+        //if (this.GetCumulativeReward() < - 500) EndEpisode();
         distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
@@ -134,7 +134,7 @@ public class ManipulatorAgent : Agent
             lastDistTarget5ToZone > zone_radius)
         {
             //Debug.Log("Episode end");
-            AddReward(1f);
+            AddReward(1.0f);
             EndEpisode();
         }
 
@@ -156,13 +156,13 @@ public class ManipulatorAgent : Agent
             }
             else
             {
-                AddReward(-0.05f);
+                AddReward(-0.1f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
         else if (lastDistTargetToZone < zone_radius)
         {
-            AddReward(1f);
+            AddReward(1.0f);
             lastDistTargetToZone = distTargetToZone;
         }
         return lastDistTargetToZone;
@@ -178,7 +178,7 @@ public class ManipulatorAgent : Agent
             }
             else
             {
-                AddReward(-0.01f);
+                AddReward(-0.02f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
@@ -241,33 +241,33 @@ public class ManipulatorAgent : Agent
         {
             //Debug.Log("part 6 low");
             //Debug.Log(part6.transform.position[1]);
-            AddReward(-1f);
+            AddReward(-1.0f);
             EndEpisode();
         }
         if (part5.transform.position[1] < 100)
         {
             //Debug.Log("part 5 low");
-            AddReward(-1f);
+            AddReward(-1.0f);
             EndEpisode();
         }
 
         if (part4.transform.position[1] < 100)
         {
             //Debug.Log("part 4 low");
-            AddReward(-1f);
+            AddReward(-1.0f);
             EndEpisode();
         }
         if (part3.transform.position[1] < 100)
         {
             //Debug.Log("part 3 low");
-            AddReward(-1f);
+            AddReward(-1.0f);
             EndEpisode();
         }
 
         if (target1.transform.position[1] < 90)
         {
             //Debug.Log("part 3 low");
-            AddReward(-1f);
+            AddReward(-1.0f);
             EndEpisode();
         }
         
@@ -289,13 +289,13 @@ public class ManipulatorAgent : Agent
         // sensor.AddObservation(target4.transform.position);
         // sensor.AddObservation(target5.transform.position);
 
-        Vector3 part6FromPart1Position = new Vector3(
-                                       part6.transform.position[0] - part1.transform.position[0],
-                                       part6.transform.position[1] - part1.transform.position[1],
-                                       part6.transform.position[2] - part1.transform.position[2]);
-        sensor.AddObservation(part6FromPart1Position[0]/maxTargetRadius);
-        sensor.AddObservation(part6FromPart1Position[1]/maxTargetRadius);
-        sensor.AddObservation(part6FromPart1Position[2]/maxTargetRadius);
+        Vector3 part4FromPart1Position = new Vector3(
+                                       part4.transform.position[0] - part1.transform.position[0],
+                                       part4.transform.position[1] - part1.transform.position[1],
+                                       part4.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(part4FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(part4FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(part4FromPart1Position[2]/maxTargetRadius);
         sensor.AddObservation(part61.transform.rotation[2]);
         //sensor.AddObservation(part6.transform.rotation);
         Vector3 zoneFromPart1Position = new Vector3(
@@ -309,7 +309,7 @@ public class ManipulatorAgent : Agent
     }
 
     private float phi1 = 0;
-    private float phi2 = 0;
+    private float phi2 = 0.0f;
     private float phi3 = 0;
     private float phi4 = 0;
     private float phi5 = 0;
@@ -331,8 +331,8 @@ public class ManipulatorAgent : Agent
             phi1 = normalizeAngle(++phi1);
             part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);     
         }
-        // float[] tpos = {target1.transform.position[0], target1.transform.position[2], 900, 0, 0, (float) Math.PI};
-        // float[] inverse = reverseKinematics(tpos);
+        // float[] tpos = {target1.transform.position[0], target1.transform.position[2], 750, 0, 0, (float) Math.PI};
+        // float[] angles = reverseKinematics(tpos);
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
         //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
         // Debug.Log("inverse: "  + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
@@ -359,9 +359,9 @@ public class ManipulatorAgent : Agent
         // part62.transform.localRotation = Quaternion.Euler(0, 0, 0);
         //Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
         float x, z, y, rad_x, rad_y, rad_z, grab;
-        x = vectorAction[0] * 3000 + part1.transform.position[0];
-        y = vectorAction[1] * 3000 + part1.transform.position[1];
-        z = vectorAction[2] * 3000 + part1.transform.position[2];
+        x = vectorAction[0] * 3000;
+        y = vectorAction[1] * 3000;
+        z = vectorAction[2] * 3000;
         //rad_z = vectorAction[3] * (float)(2 * Math.PI);
         //rad_y = vectorAction[4] * (float)(2 * Math.PI);
         //rad_x = vectorAction[5] * (float)(2 * Math.PI);
@@ -373,8 +373,6 @@ public class ManipulatorAgent : Agent
         float[] coordinates = {x, z, y, 0, 0, (float)Math.PI};   
         float[] angles = reverseKinematics(coordinates);
 
-
-
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
         //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
         // Debug.Log("angles: "  + angles[0] + "//" + angles[1] + "//" + angles[2] 
@@ -382,6 +380,7 @@ public class ManipulatorAgent : Agent
         // Debug.Log("inverse: " + angles[0] + "//1:" + angles[1] + "//2:" + angles[2] + "//3:" + angles[3] + "//4:" + angles[4] + "//5:" + angles[5]);
         //float[] p4pos = calcPosition(angles);
         //Debug.Log("pos x: " + p4pos[0] + "//z:" + p4pos[1] + "//y:" + p4pos[2] + "//rz:" + p4pos[3] + "//ry:" + p4pos[4] + "//rx:" + p4pos[5]);
+
         float target_phi1 = radToDegree(angles[0]);
         float target_phi2 = radToDegree(angles[1]);
         float target_phi3 = radToDegree(angles[2]);
@@ -391,34 +390,28 @@ public class ManipulatorAgent : Agent
         // check limits
         if (target_phi2 > part2_max)
         {
-            //AddReward(-10f);
             target_phi2 = part2_max;
         }
         else if (target_phi2 < part2_min)
         {
-            //AddReward(-10f);
             target_phi2 = part2_min;
         } 
 
         if (target_phi3 > part3_max)
         {
-            //AddReward(-10f);
             target_phi3 = part3_max;
         } 
         else if (target_phi3 < part3_min)
         {
-            //AddReward(-10f);
             target_phi3 = part3_min;
         }
 
         if (target_phi5 > part5_max) 
         {
-            //AddReward(-10f);
             target_phi5 = part5_max;
         }
         else if (target_phi5 < part5_min)
         {
-            //AddReward(-10f);  
             target_phi5 = part5_min;
         } 
 
@@ -436,10 +429,8 @@ public class ManipulatorAgent : Agent
         phi1 = normalizeAngle(phi1);
 
         part1.transform.localRotation = Quaternion.Euler(0, phi1, 0); 
-
         /*******************phi 2**********************/
         diff = target_phi2 - phi2;
-        //Debug.Log("phi2 before:" + phi2);
         if (diff > 1)
         {
             phi2 += speed;
@@ -449,7 +440,6 @@ public class ManipulatorAgent : Agent
             phi2 -= speed;
         }
         phi2 = normalizeAngle(phi2);
-
         part2.transform.localRotation = Quaternion.Euler(0, 0, phi2); 
 
         /*******************phi 3**********************/
@@ -464,69 +454,77 @@ public class ManipulatorAgent : Agent
         }
         phi3 = normalizeAngle(phi3);
         part3.transform.localRotation = Quaternion.Euler(0, 0, phi3); 
+        float[] newPos = {part4.transform.position[0] - part1.transform.position[0], 
+                          part4.transform.position[2] - part1.transform.position[2], 
+                          part4.transform.position[1] - part1.transform.position[1],
+                          0, 0, (float) Math.PI};
+        angles = reverseKinematics(newPos);
+        part4.transform.localRotation = Quaternion.Euler(radToDegree(angles[3]), 0, 0);
+        part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(angles[4]));
+        part6.transform.localRotation = Quaternion.Euler(radToDegree(angles[5]), 0, 0);
 
-        /*******************phi 4**********************/
-        diff = target_phi4 - phi4;
-        if (diff > 1)
-        {
-            phi4 += speed * 2;
-        }
-        else if ( diff < -1)
-        {
-            phi4 -= speed * 2;
-        }
-        else if (diff > 0 && diff < 1)
-        {
-            phi4 += speed/8;
-        }
-        else
-        {
-            phi4 -= speed/8;
-        }
-        phi4 = normalizeAngle(phi4);
-        part4.transform.localRotation = Quaternion.Euler(phi4, 0, 0);
+        // /*******************phi 4**********************/
+        // diff = target_phi4 - phi4;
+        // if (diff > 1)
+        // {
+        //     phi4 += speed * 2;
+        // }
+        // else if ( diff < -1)
+        // {
+        //     phi4 -= speed * 2;
+        // }
+        // else if (diff > 0 && diff < 1)
+        // {
+        //     phi4 += speed/8;
+        // }
+        // else
+        // {
+        //     phi4 -= speed/8;
+        // }
+        // phi4 = normalizeAngle(phi4);
+        // part4.transform.localRotation = Quaternion.Euler(phi4, 0, 0);
 
-        /*******************phi 5**********************/
-        diff = target_phi5 - phi5;
-        if (diff > 1)
-        {
-            phi5 += speed * 2;
-        }
-        else if ( diff < -1)
-        {
-            phi5 -= speed * 2;
-        }
-        else if (diff > 0 && diff < 1)
-        {
-            phi5 += speed/8;
-        }
-        else
-        {
-            phi5 -= speed/8;
-        }
-        phi5 = normalizeAngle(phi5);
-        part5.transform.localRotation = Quaternion.Euler(0, 0, phi5);
+        // /*******************phi 5**********************/
+        // diff = target_phi5 - phi5;
+        // if (diff > 1)
+        // {
+        //     phi5 += speed * 2;
+        // }
+        // else if ( diff < -1)
+        // {
+        //     phi5 -= speed * 2;
+        // }
+        // else if (diff > 0 && diff < 1)
+        // {
+        //     phi5 += speed/8;
+        // }
+        // else
+        // {
+        //     phi5 -= speed/8;
+        // }
+        // phi5 = normalizeAngle(phi5);
+        // part5.transform.localRotation = Quaternion.Euler(0, 0, phi5);
 
-        /*******************phi 6**********************/
-        diff = target_phi6 - phi6;
-        if (diff > 1)
-        {
-            phi6 += speed * 2;
-        }
-        else if ( diff < -1)
-        {
-            phi6 -= speed * 2;
-        }
-        else if (diff > 0 && diff < 1)
-        {
-            phi6 += speed/8;
-        }
-        else
-        {
-            phi6 -= speed/8;
-        }
-        phi6 = normalizeAngle(phi6);
-        part6.transform.localRotation = Quaternion.Euler(phi6, 0, 0);
+        // /*******************phi 6**********************/
+        // diff = target_phi6 - phi6;
+        // if (diff > 1)
+        // {
+        //     phi6 += speed * 2;
+        // }
+        // else if ( diff < -1)
+        // {
+        //     phi6 -= speed * 2;
+        // }
+        // else if (diff > 0 && diff < 1)
+        // {
+        //     phi6 += speed/8;
+        // }
+        // else
+        // {
+        //     phi6 -= speed/8;
+        // }
+        // phi6 = normalizeAngle(phi6);
+        // part6.transform.localRotation = Quaternion.Euler(phi6, 0, 0);
 
         /****************end effector *************************/
         if (doGrab)
@@ -637,9 +635,15 @@ public class ManipulatorAgent : Agent
         // }
         // target5.GetComponent<Rigidbody>().velocity = Vector3.zero;  
         // target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        target2.SetActive(false);
+        target3.SetActive(false);
+        target4.SetActive(false);
+        target5.SetActive(false);
 
-
-        float[] tpos = {target1.transform.position[0], target1.transform.position[2], 750, 0, 0, (float) Math.PI};
+        float[] tpos = {target1.transform.position[0] - part1.transform.position[0], 
+                        target1.transform.position[2] - part1.transform.position[2], 
+                        target1.transform.position[1] + 600 -  - part1.transform.position[1], 
+                        0, 0, (float) Math.PI};
         float[] inverse = reverseKinematics(tpos);
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
         //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
@@ -651,11 +655,11 @@ public class ManipulatorAgent : Agent
         phi6 = radToDegree(inverse[5]);
         phi61 = 0;
         phi62 = 0;
-        //float[] p6_pos = calcPosition(inverse);
+        float[] p4_pos = calcPosition(inverse);
         // Debug.Log("inverse: "  + inverse[0] + "//" + inverse[1] + "//" + inverse[2] 
         //                                  + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]);
-        // Debug.Log("position: "  + p6_pos[0] + "//" + p6_pos[1] + "//" + p6_pos[2] 
-        //                                 + "//" + p6_pos[3] + "//" + p6_pos[4] + "//" + p6_pos[5]);
+        // Debug.Log("position: "  + p4_pos[0] + "//" + p4_pos[1] + "//" + p4_pos[2] 
+        //                                 + "//" + p4_pos[3] + "//" + p4_pos[4] + "//" + p4_pos[5]);
         ////Debug.Log("Episode Begin");
         part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);
         part2.transform.localRotation = Quaternion.Euler(0, 0, phi2);
