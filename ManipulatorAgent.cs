@@ -113,10 +113,10 @@ public class ManipulatorAgent : Agent
         distEndEffectorToTarget4 = Vector3.Distance(part6.transform.position, target4.transform.position);
         distEndEffectorToTarget5 = Vector3.Distance(part6.transform.position, target5.transform.position);
 
+        distTarget1ToZone = flatDistance(target1.transform.position, zone.transform.position);
         distTarget2ToZone = flatDistance(target2.transform.position, zone.transform.position);
         distTarget3ToZone = flatDistance(target3.transform.position, zone.transform.position);
         distTarget4ToZone = flatDistance(target4.transform.position, zone.transform.position);
-        distTarget1ToZone = flatDistance(target1.transform.position, zone.transform.position);
         distTarget5ToZone = flatDistance(target5.transform.position, zone.transform.position);
         
         lastDistTarget1ToZone = rewardForPushingTargetFromZone(distTarget1ToZone, lastDistTarget1ToZone);
@@ -300,15 +300,15 @@ public class ManipulatorAgent : Agent
     {
         if (float.IsNaN(vectorAction[0])||
             float.IsNaN(vectorAction[1])||
-            float.IsNaN(vectorAction[2])||
-            float.IsNaN(vectorAction[3])||
-            float.IsNaN(vectorAction[4])||
-            float.IsNaN(vectorAction[5]))
+            float.IsNaN(vectorAction[2])
+            //float.IsNaN(vectorAction[3])||
+            //float.IsNaN(vectorAction[4])||
+            //float.IsNaN(vectorAction[5])
+            )
         {
             //EndEpisode();
             phi1 = normalizeAngle(++phi1);
             part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);     
-
         }
         // float[] tpos = {target1.transform.position[0], target1.transform.position[2], 900, 0, 0, (float) Math.PI};
         // float[] inverse = reverseKinematics(tpos);
@@ -341,22 +341,25 @@ public class ManipulatorAgent : Agent
         x = vectorAction[0] * 3000;
         y = vectorAction[1] * 3000;
         z = vectorAction[2] * 3000;
-        rad_z = vectorAction[3] * (float)(2 * Math.PI);
-        rad_y = vectorAction[4] * (float)(2 * Math.PI);
-        rad_x = vectorAction[5] * (float)(2 * Math.PI);
+        //rad_z = vectorAction[3] * (float)(2 * Math.PI);
+        //rad_y = vectorAction[4] * (float)(2 * Math.PI);
+        //rad_x = vectorAction[5] * (float)(2 * Math.PI);
 
         //Debug.Log("x: " + (int)x + " z: " + (int)y + " y: " + (int)z + " rz: " + Math.Round(rad_z, 2) + " ry: " + Math.Round(rad_y, 2) + " rx: " + Math.Round(rad_x, 2));
-        grab = vectorAction[6];
+        grab = vectorAction[3];
         bool doGrab = grab > 0.5;
 
-        float[] coordinates = {x, z, y, rad_z, rad_y, rad_x};   
+        float[] coordinates = {x, z, y, 0, 0, (float)Math.PI};   
         float[] angles = reverseKinematics(coordinates);
+
+
+
         // Debug.Log("tpos: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2] 
         //                                 + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]);
         // Debug.Log("angles: "  + angles[0] + "//" + angles[1] + "//" + angles[2] 
         //                                  + "//" + angles[3] + "//" + angles[4] + "//" + angles[5]);
         // Debug.Log("inverse: " + angles[0] + "//1:" + angles[1] + "//2:" + angles[2] + "//3:" + angles[3] + "//4:" + angles[4] + "//5:" + angles[5]);
-        float[] p4pos = calcPosition(angles);
+        //float[] p4pos = calcPosition(angles);
         //Debug.Log("pos x: " + p4pos[0] + "//z:" + p4pos[1] + "//y:" + p4pos[2] + "//rz:" + p4pos[3] + "//ry:" + p4pos[4] + "//rx:" + p4pos[5]);
         float target_phi1 = radToDegree(angles[0]);
         float target_phi2 = radToDegree(angles[1]);
@@ -445,11 +448,19 @@ public class ManipulatorAgent : Agent
         diff = target_phi4 - phi4;
         if (diff > 1)
         {
-            phi4 += speed;
+            phi4 += speed * 2;
         }
         else if ( diff < -1)
         {
-            phi4 -= speed;
+            phi4 -= speed * 2;
+        }
+        else if (diff > 0 && diff < 1)
+        {
+            phi4 += speed/8;
+        }
+        else
+        {
+            phi4 -= speed/8;
         }
         phi4 = normalizeAngle(phi4);
         part4.transform.localRotation = Quaternion.Euler(phi4, 0, 0);
@@ -458,11 +469,19 @@ public class ManipulatorAgent : Agent
         diff = target_phi5 - phi5;
         if (diff > 1)
         {
-            phi5 += speed;
+            phi5 += speed * 2;
         }
         else if ( diff < -1)
         {
-            phi5 -= speed;
+            phi5 -= speed * 2;
+        }
+        else if (diff > 0 && diff < 1)
+        {
+            phi5 += speed/8;
+        }
+        else
+        {
+            phi5 -= speed/8;
         }
         phi5 = normalizeAngle(phi5);
         part5.transform.localRotation = Quaternion.Euler(0, 0, phi5);
@@ -471,11 +490,19 @@ public class ManipulatorAgent : Agent
         diff = target_phi6 - phi6;
         if (diff > 1)
         {
-            phi6 += speed;
+            phi6 += speed * 2;
         }
         else if ( diff < -1)
         {
-            phi6 -= speed;
+            phi6 -= speed * 2;
+        }
+        else if (diff > 0 && diff < 1)
+        {
+            phi6 += speed/8;
+        }
+        else
+        {
+            phi6 -= speed/8;
         }
         phi6 = normalizeAngle(phi6);
         part6.transform.localRotation = Quaternion.Euler(phi6, 0, 0);
@@ -483,13 +510,13 @@ public class ManipulatorAgent : Agent
         /****************end effector *************************/
         if (doGrab)
         {
-            if (phi61 > end_min) phi61 -= speed;
-            if (phi62 < -end_min) phi62 += speed;
+            if (phi61 > end_min) phi61 -= speed*2;
+            if (phi62 < -end_min) phi62 += speed*2;
         }
         else
         {
-            if (phi61 < end_max) phi61 += speed;
-            if (phi62 > -end_max) phi62 -= speed;
+            if (phi61 < end_max) phi61 += speed*2;
+            if (phi62 > -end_max) phi62 -= speed*2;
         }
         part61.transform.localRotation = Quaternion.Euler(0, 0, phi61);
         part62.transform.localRotation = Quaternion.Euler(0, 0, phi62);
