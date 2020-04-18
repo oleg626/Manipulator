@@ -276,14 +276,28 @@ public class ManipulatorAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(target1.transform.position);
+        Vector3 target1FromPart1Position = new Vector3(
+                                         target1.transform.position[0] - part1.transform.position[0],
+                                         target1.transform.position[1] - part1.transform.position[1],
+                                         target1.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(target1FromPart1Position);
         // sensor.AddObservation(target2.transform.position);
         // sensor.AddObservation(target3.transform.position);
         // sensor.AddObservation(target4.transform.position);
         // sensor.AddObservation(target5.transform.position);
-        sensor.AddObservation(part6.transform.position);
-        sensor.AddObservation(part6.transform.rotation);
-        sensor.AddObservation(zone.transform.position);
+
+        Vector3 part6FromPart1Position = new Vector3(
+                                       part6.transform.position[0] - part1.transform.position[0],
+                                       part6.transform.position[1] - part1.transform.position[1],
+                                       part6.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(part6FromPart1Position);
+        sensor.AddObservation(part61.transform.rotation[2]);
+        //sensor.AddObservation(part6.transform.rotation);
+        Vector3 zoneFromPart1Position = new Vector3(
+                                      zone.transform.position[0] - part1.transform.position[0],
+                                      zone.transform.position[1] - part1.transform.position[1],
+                                      zone.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(zoneFromPart1Position);
         sensor.AddObservation(zone_radius);
     }
 
@@ -338,9 +352,9 @@ public class ManipulatorAgent : Agent
         // part62.transform.localRotation = Quaternion.Euler(0, 0, 0);
         //Debug.Log("0: " + vectorAction[0] + "//1:" + vectorAction[1] + "//2:" + vectorAction[2] + "//3:" + vectorAction[3] + "//4:" + vectorAction[4] + "//5:" + vectorAction[5]);
         float x, z, y, rad_x, rad_y, rad_z, grab;
-        x = vectorAction[0] * 3000;
-        y = vectorAction[1] * 3000;
-        z = vectorAction[2] * 3000;
+        x = vectorAction[0] * 3000 + part1.transform.position[0];
+        y = vectorAction[1] * 3000 + part1.transform.position[1];
+        z = vectorAction[2] * 3000 + part1.transform.position[2];
         //rad_z = vectorAction[3] * (float)(2 * Math.PI);
         //rad_y = vectorAction[4] * (float)(2 * Math.PI);
         //rad_x = vectorAction[5] * (float)(2 * Math.PI);
@@ -547,7 +561,10 @@ public class ManipulatorAgent : Agent
         // }
         // else
         // {
-        target1.transform.position = new Vector3(1500, 102, 200);
+        Vector3 spawnTarget1 = new Vector3(part1.transform.position[0]+1500,
+                                           part1.transform.position[1]+102,
+                                           part1.transform.position[2]+200);
+        target1.transform.position = spawnTarget1;
         //}
         target1.GetComponent<Rigidbody>().velocity = Vector3.zero;
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
