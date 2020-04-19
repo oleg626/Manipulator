@@ -49,6 +49,7 @@ public class ManipulatorAgent : Agent
 
     private void Update()
     {
+        AddReward(-0.01f);
         // float discretization = (float) Math.PI / 3;
         // float[] position = new float[6];
         // float[] inverse = new float[6];
@@ -150,7 +151,7 @@ public class ManipulatorAgent : Agent
     {
         if (distTargetToZone < zone_radius)
         {
-            if (distTargetToZone > lastDistTargetToZone)
+            if (distTargetToZone > lastDistTargetToZone + 2)
             {
                 AddReward(0.05f);
             }
@@ -172,13 +173,13 @@ public class ManipulatorAgent : Agent
     {
         if (distTarget1ToZone < zone_radius)
         {
-            if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1)
+            if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 2)
             {
                 AddReward(0.01f);
             }
             else
             {
-                AddReward(-0.02f);
+                AddReward(-0.05f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
@@ -241,33 +242,33 @@ public class ManipulatorAgent : Agent
         {
             //Debug.Log("part 6 low");
             //Debug.Log(part6.transform.position[1]);
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();
         }
         if (part5.transform.position[1] < 100)
         {
             //Debug.Log("part 5 low");
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();
         }
 
         if (part4.transform.position[1] < 100)
         {
             //Debug.Log("part 4 low");
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();
         }
         if (part3.transform.position[1] < 100)
         {
             //Debug.Log("part 3 low");
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();
         }
 
         if (target1.transform.position[1] < 90)
         {
             //Debug.Log("part 3 low");
-            AddReward(-1.0f);
+            AddReward(-5.0f);
             EndEpisode();
         }
         
