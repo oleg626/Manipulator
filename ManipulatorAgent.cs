@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
 using MLAgents.Sensors;
+using MLAgents.SideChannels;
+using Barracuda;
 using TMPro;
 using System;
 using System.Threading;
+
 
 public class ManipulatorAgent : Agent
 {
@@ -46,6 +49,14 @@ public class ManipulatorAgent : Agent
     private float distTarget4ToZone;
     private float distTarget1ToZone;
     private float distTarget5ToZone;
+
+    FloatPropertiesChannel m_FloatProperties;
+
+    public override void Initialize()
+    {
+        //SideChannelUtils.GetSideChannel<FloatPropertiesChannel>();
+    }
+    
 
     private void Update()
     {
@@ -94,13 +105,13 @@ public class ManipulatorAgent : Agent
     {
         if (distTargetToZone < zone_radius)
         {
-            if (distTargetToZone > lastDistTargetToZone + 2)
+            if (distTargetToZone > lastDistTargetToZone + 1)
             {
                 AddReward(0.05f);
             }
             else
             {
-                AddReward(-0.1f);
+                AddReward(-0.05f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
@@ -116,13 +127,13 @@ public class ManipulatorAgent : Agent
     {
         if (distTarget1ToZone < zone_radius)
         {
-            if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 2)
+            if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
             {
                 AddReward(0.01f);
             }
             else
             {
-                AddReward(-0.05f);
+                AddReward(-0.01f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
@@ -263,6 +274,7 @@ public class ManipulatorAgent : Agent
             )
         {
             //EndEpisode();
+            Debug.Log("NAN");
             phi1 = normalizeAngle(++phi1);
             part1.transform.localRotation = Quaternion.Euler(0, phi1, 0);     
         }
@@ -383,16 +395,17 @@ public class ManipulatorAgent : Agent
     private bool useTarget3 = false;
     private bool useTarget4 = false;
     private bool useTarget5 = false;
-    private float distanceFromZone = 200f;
+    //private float distanceFromZone = 14f;
 
     public override void OnEpisodeBegin()
     {
-
+        float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
         //11111111111111111111111111
         Vector3 spawnTarget1 = zone.transform.position;
-        spawnTarget1.transform.position[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-        spawnTarget1.transform.position[1] += 101
-        spawnTarget1.transform.position[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        spawnTarget1[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        spawnTarget1[1] += 101;
+        spawnTarget1[2] += zone_radius - 100 - distanceFromZone;
+        spawnTarget1[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
         target1.transform.position = spawnTarget1;
         target1.GetComponent<Rigidbody>().velocity = Vector3.zero;
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -465,7 +478,7 @@ public class ManipulatorAgent : Agent
 
         float[] tpos = {target1.transform.position[0] - part1.transform.position[0], 
                         target1.transform.position[2] - part1.transform.position[2], 
-                        target1.transform.position[1] + 600 -  - part1.transform.position[1], 
+                        target1.transform.position[1] - part1.transform.position[1] + 700, 
                         0, 0, (float) Math.PI};
         float[] inverse = reverseKinematics(tpos);
 
