@@ -18,8 +18,8 @@ public class ManipulatorAgent : Agent
     public float speed;
     public float part2_min =  0;
     public float part2_max =  90;
-    public float part3_min = -110;
-    public float part3_max =  110;
+    public float part3_min = -150;
+    public float part3_max =  0;
     public float part5_min = -100;
     public float part5_max =  100;
     public float end_min = 1;
@@ -268,9 +268,9 @@ public class ManipulatorAgent : Agent
 
     public override void OnActionReceived(float[] vectorAction)
     {
-        if (float.IsNaN(vectorAction[0])||
-            float.IsNaN(vectorAction[1])||
-            float.IsNaN(vectorAction[2])
+        if (float.IsNaN(vectorAction[0])
+            //float.IsNaN(vectorAction[1])||
+            //float.IsNaN(vectorAction[2])
             )
         {
             //EndEpisode();
@@ -280,112 +280,183 @@ public class ManipulatorAgent : Agent
         }
         
         float x, z, y, rad_x, rad_y, rad_z, grab;
-        x = vectorAction[0] * 3000;
-        y = vectorAction[1] * 3000;
-        z = vectorAction[2] * 3000;
+        bool doGrab = false;
 
-        grab = vectorAction[3];
-        bool doGrab = grab > 0.5;
+        x = part4.transform.position[0] - part1.transform.position[0];
+        y = part4.transform.position[1] - part1.transform.position[1];
+        z = part4.transform.position[2] - part1.transform.position[2];
+        //Debug.Log("part4 x: " + x + " y: " + y + " z: " + z);
+        var action = Mathf.FloorToInt(vectorAction[0]);
+        //Debug.Log(action);
+        float actionSpeed = 5.0f;
+        switch (action)
+        {
+            case 0:
+                // do nothing
+                break;
+            case 1:
+                // x+
+                x += actionSpeed;
+                break;
+            case 2:
+                // x-
+                x -= actionSpeed;
+                break;
+            case 3:
+                // y+
+                y += actionSpeed;
+                break;
+            case 4:
+                // y-
+                y -= actionSpeed;
+                break;
+            case 5:
+                // z+
+                z += actionSpeed;
+                break;
+            case 6:
+                // z-
+                z -= actionSpeed;
+                break;
+            case 7:
+                doGrab = true;
+                break;
+            case 8:
+                doGrab = false;
+                break;
+            default:
+                throw new ArgumentException("Invalid action value");
+        }
+        //Debug.Log(x + " " + y + " " + z);
+        // x = vectorAction[0] * 3000;
+        // y = vectorAction[1] * 3000;
+        // z = vectorAction[2] * 3000;
 
+        // grab = vectorAction[3];
+        // bool doGrab = grab > 0.5;
+        // Debug.Log("after action x: " + (int)x + " z: " + (int)y + " y: " + (int)z); 
         float[] coordinates = {x, z, y, 0, 0, (float)Math.PI};   
         float[] angles = reverseKinematics(coordinates);
+        float[] backPos = calcPosition(angles);
+        // Debug.Log("angles: "  + angles[0] + "//" + angles[1] + "//" + angles[2]  
+        //                                  + "//" + angles[3] + "//" + angles[4] + "//" + angles[5]); 
+        // Debug.Log("tpos: "  + backPos[0] + "//" + backPos[1] + "//" + backPos[2]  
+        //                                 + "//" + backPos[3] + "//" + backPos[4] + "//" + backPos[5]); 
+        // if (Mathf.Approximately(coordinates[0], backPos[0]) &&
+        //     Mathf.Approximately(coordinates[1], backPos[1]) &&
+        //     Mathf.Approximately(coordinates[2], backPos[2]))
+        //     {
+        //         Debug.Log("instant port");
+        //         part1.transform.localRotation = Quaternion.Euler(0, angles[0], 0); 
+        //         part2.transform.localRotation = Quaternion.Euler(0, 0, angles[1]); 
+        //         part3.transform.localRotation = Quaternion.Euler(0, 0, angles[2]); 
+        //         float[] newPos = {part4.transform.position[0] - part1.transform.position[0], 
+        //                           part4.transform.position[2] - part1.transform.position[2], 
+        //                           part4.transform.position[1] - part1.transform.position[1],
+        //                           0, 0, (float) Math.PI};
+        //         angles = reverseKinematics(newPos);
+        //         part4.transform.localRotation = Quaternion.Euler(radToDegree(angles[3]), 0, 0);
+        //         part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(angles[4]));
+        //         part6.transform.localRotation = Quaternion.Euler(radToDegree(angles[5]), 0, 0);
+        //     }
+        // else
+        // {
+            float target_phi1 = radToDegree(angles[0]);
+            float target_phi2 = radToDegree(angles[1]);
+            float target_phi3 = radToDegree(angles[2]);
+            float target_phi4 = radToDegree(angles[3]);
+            float target_phi5 = radToDegree(angles[4]);
+            float target_phi6 = radToDegree(angles[5]);
+            // check limits
+            if (target_phi2 > part2_max)
+            {
+                target_phi2 = part2_max;
+            }
+            else if (target_phi2 < part2_min)
+            {
+                target_phi2 = part2_min;
+            } 
 
-        float target_phi1 = radToDegree(angles[0]);
-        float target_phi2 = radToDegree(angles[1]);
-        float target_phi3 = radToDegree(angles[2]);
-        float target_phi4 = radToDegree(angles[3]);
-        float target_phi5 = radToDegree(angles[4]);
-        float target_phi6 = radToDegree(angles[5]);
-        // check limits
-        if (target_phi2 > part2_max)
-        {
-            target_phi2 = part2_max;
-        }
-        else if (target_phi2 < part2_min)
-        {
-            target_phi2 = part2_min;
-        } 
+            if (target_phi3 > part3_max)
+            {
+                target_phi3 = part3_max;
+            } 
+            else if (target_phi3 < part3_min)
+            {
+                target_phi3 = part3_min;
+            }
 
-        if (target_phi3 > part3_max)
-        {
-            target_phi3 = part3_max;
-        } 
-        else if (target_phi3 < part3_min)
-        {
-            target_phi3 = part3_min;
-        }
+            if (target_phi5 > part5_max) 
+            {
+                target_phi5 = part5_max;
+            }
+            else if (target_phi5 < part5_min)
+            {
+                target_phi5 = part5_min;
+            } 
 
-        if (target_phi5 > part5_max) 
-        {
-            target_phi5 = part5_max;
-        }
-        else if (target_phi5 < part5_min)
-        {
-            target_phi5 = part5_min;
-        } 
+            float diff;
+            /*******************phi 1**********************/
+            diff = target_phi1 - phi1;
+            if (diff > 0.1)
+            {
+                phi1 += speed;
+            }
+            else if (diff < -0.1)
+            {
+                phi1 -= speed;
+            }
+            phi1 = normalizeAngle(phi1);
 
-        float diff;
-        /*******************phi 1**********************/
-        diff = target_phi1 - phi1;
-        if (diff > 1)
-        {
-            phi1 += speed;
-        }
-        else if (diff < -1)
-        {
-            phi1 -= speed;
-        }
-        phi1 = normalizeAngle(phi1);
+            part1.transform.localRotation = Quaternion.Euler(0, phi1, 0); 
+            /*******************phi 2**********************/
+            diff = target_phi2 - phi2;
+            if (diff > 0.1)
+            {
+                phi2 += speed;
+            }
+            else if ( diff < -0.1)
+            {
+                phi2 -= speed;
+            }
+            phi2 = normalizeAngle(phi2);
+            part2.transform.localRotation = Quaternion.Euler(0, 0, phi2); 
 
-        part1.transform.localRotation = Quaternion.Euler(0, phi1, 0); 
-        /*******************phi 2**********************/
-        diff = target_phi2 - phi2;
-        if (diff > 1)
-        {
-            phi2 += speed;
-        }
-        else if ( diff < -1)
-        {
-            phi2 -= speed;
-        }
-        phi2 = normalizeAngle(phi2);
-        part2.transform.localRotation = Quaternion.Euler(0, 0, phi2); 
+            /*******************phi 3**********************/
+            diff = target_phi3 - phi3;
+            if (diff > 0.1)
+            {
+                phi3 += speed;
+            }
+            else if ( diff < -0.1)
+            {
+                phi3 -= speed;
+            }
+            phi3 = normalizeAngle(phi3);
+            part3.transform.localRotation = Quaternion.Euler(0, 0, phi3); 
+            float[] newPos = {part4.transform.position[0] - part1.transform.position[0], 
+                            part4.transform.position[2] - part1.transform.position[2], 
+                            part4.transform.position[1] - part1.transform.position[1],
+                            0, 0, (float) Math.PI};
+            angles = reverseKinematics(newPos);
+            part4.transform.localRotation = Quaternion.Euler(radToDegree(angles[3]), 0, 0);
+            part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(angles[4]));
+            part6.transform.localRotation = Quaternion.Euler(radToDegree(angles[5]), 0, 0);
 
-        /*******************phi 3**********************/
-        diff = target_phi3 - phi3;
-        if (diff > 1)
-        {
-            phi3 += speed;
-        }
-        else if ( diff < -1)
-        {
-            phi3 -= speed;
-        }
-        phi3 = normalizeAngle(phi3);
-        part3.transform.localRotation = Quaternion.Euler(0, 0, phi3); 
-        float[] newPos = {part4.transform.position[0] - part1.transform.position[0], 
-                          part4.transform.position[2] - part1.transform.position[2], 
-                          part4.transform.position[1] - part1.transform.position[1],
-                          0, 0, (float) Math.PI};
-        angles = reverseKinematics(newPos);
-        part4.transform.localRotation = Quaternion.Euler(radToDegree(angles[3]), 0, 0);
-        part5.transform.localRotation = Quaternion.Euler(0, 0, radToDegree(angles[4]));
-        part6.transform.localRotation = Quaternion.Euler(radToDegree(angles[5]), 0, 0);
-
-        /****************end effector *************************/
-        if (doGrab)
-        {
-            if (phi61 > end_min) phi61 -= speed*2;
-            if (phi62 < -end_min) phi62 += speed*2;
-        }
-        else
-        {
-            if (phi61 < end_max) phi61 += speed*2;
-            if (phi62 > -end_max) phi62 -= speed*2;
-        }
-        part61.transform.localRotation = Quaternion.Euler(0, 0, phi61);
-        part62.transform.localRotation = Quaternion.Euler(0, 0, phi62);
-
+            /****************end effector *************************/
+            if (doGrab)
+            {
+                if (phi61 > end_min) phi61 -= speed*2;
+                if (phi62 < -end_min) phi62 += speed*2;
+            }
+            else
+            {
+                if (phi61 < end_max) phi61 += speed*2;
+                if (phi62 > -end_max) phi62 -= speed*2;
+            }
+            part61.transform.localRotation = Quaternion.Euler(0, 0, phi61);
+            part62.transform.localRotation = Quaternion.Euler(0, 0, phi62);
+        //}
         Update();
 
     }
@@ -399,13 +470,15 @@ public class ManipulatorAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+        //float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+        float distanceFromZone = 400;
         //11111111111111111111111111
         Vector3 spawnTarget1 = zone.transform.position;
-        spawnTarget1[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
+        float dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone;
+        spawnTarget1[0] += dist * (float)Math.Cos(rad);
         spawnTarget1[1] += 101;
-        spawnTarget1[2] += zone_radius - 100 - distanceFromZone;
-        spawnTarget1[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
+        spawnTarget1[2] += dist * (float)Math.Sin(rad);
         target1.transform.position = spawnTarget1;
         target1.GetComponent<Rigidbody>().velocity = Vector3.zero;
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -476,12 +549,33 @@ public class ManipulatorAgent : Agent
         target4.SetActive(false);
         target5.SetActive(false);
 
-        float[] tpos = {target1.transform.position[0] - part1.transform.position[0], 
-                        target1.transform.position[2] - part1.transform.position[2], 
-                        target1.transform.position[1] - part1.transform.position[1] + 700, 
-                        0, 0, (float) Math.PI};
-        float[] inverse = reverseKinematics(tpos);
+        float tx = target1.transform.position[0];
+        float tz = target1.transform.position[2];
+        float ty = target1.transform.position[1] + 700;
 
+        float default_x = part1.transform.position[0] + 1500;
+        float default_z = part1.transform.position[2];
+        float default_y = part1.transform.position[1] + 1000;
+
+        float dx = tx - default_x;
+        float dy = ty - default_y;
+        float dz = tz - default_z;
+
+        float close_coeff = 0;
+        //float close_coeff = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff", 1.0f);
+        //Debug.Log(close_coeff);
+        float[] tpos = {default_x + dx * close_coeff - part1.transform.position[0], 
+                        default_z + dz * close_coeff - part1.transform.position[2], 
+                        default_y + dy * close_coeff - part1.transform.position[1], 
+                        0, 0, (float) Math.PI};
+        // Debug.Log("tpos target*******************************: "  + tpos[0] + "//" + tpos[1] + "//" + tpos[2]  
+        //         + "//" + tpos[3] + "//" + tpos[4] + "//" + tpos[5]); 
+        float[] inverse = reverseKinematics(tpos);
+        float[] backPos = calcPosition(inverse);
+        // Debug.Log("angles: "  + inverse[0] + "//" + inverse[1] + "//" + inverse[2]  
+        //                                  + "//" + inverse[3] + "//" + inverse[4] + "//" + inverse[5]); 
+        // Debug.Log("tpos: "  + backPos[0] + "//" + backPos[1] + "//" + backPos[2]  
+        //                                 + "//" + backPos[3] + "//" + backPos[4] + "//" + backPos[5]);
         phi1 = radToDegree(inverse[0]);
         phi2 = radToDegree(inverse[1]);
         phi3 = radToDegree(inverse[2]);
@@ -607,7 +701,7 @@ public class ManipulatorAgent : Agent
         {
             phi3 = 0;
         } 
-        else if (cosphi3 < 0.0000001)
+        else if (Math.Abs(cosphi3) < 0.0000001)
         {
             phi3 = Math.PI/2;
         }
