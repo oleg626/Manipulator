@@ -15,6 +15,7 @@ public class ManipulatorAgent : Agent
 
     public GameObject part1, part2, part3, part4, part5, part6, part61, part62, target1, target2, target3, target4, target5, zone, cube;
     public TextMeshPro rewardText;
+    public float actionSpeed = 5.0f;
     public float speed;
     public float part2_min =  0;
     public float part2_max =  90;
@@ -83,13 +84,42 @@ public class ManipulatorAgent : Agent
 
         rewardForApproachingTarget();
 
+        //Debug.Log(part6.transform.position[1]);
+        if (part6.transform.position[1] < 150)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+        if (part5.transform.position[1] < 100)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (part4.transform.position[1] < 100)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+        if (part3.transform.position[1] < 100)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (target1.transform.position[1] < 90)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
         if (lastDistTarget1ToZone > zone_radius &&
             lastDistTarget2ToZone > zone_radius &&
             lastDistTarget3ToZone > zone_radius &&
             lastDistTarget4ToZone > zone_radius &&
             lastDistTarget5ToZone > zone_radius)
         {
-            AddReward(1.0f);
+            AddReward(5.0f);
             EndEpisode();
         }
 
@@ -111,7 +141,7 @@ public class ManipulatorAgent : Agent
             }
             else
             {
-                AddReward(-0.05f);
+                AddReward(-0.03f);
             }
             lastDistTargetToZone = distTargetToZone;
         }
@@ -129,27 +159,29 @@ public class ManipulatorAgent : Agent
         {
             if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
             {
-                AddReward(0.01f);
+                AddReward(0.05f);
             }
             else
             {
-                AddReward(-0.01f);
+                AddReward(-0.03f);
             }
             lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
         }
+
         //2222222222222222222222222222222222
-        // if (distTarget2ToZone < zone_radius)
-        // {
-        //     if (distEndEffectorToTarget2 < lastDistEndEffectorToTarget2)
-        //     {
-        //         AddReward(0.1f);
-        //     }
-        //     else
-        //     {
-        //         AddReward(-0.1f);
-        //     }
-        //     lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
-        // }
+        if (distTarget2ToZone < zone_radius)
+        {
+            if (distEndEffectorToTarget2 < lastDistEndEffectorToTarget2)
+            {
+                AddReward(0.05f);
+            }
+            else
+            {
+                AddReward(-0.03f);
+            }
+            lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
+        }
+        
         // //3333333333333333333333333333333333
         // if (distTarget3ToZone < zone_radius)
         // {
@@ -189,43 +221,11 @@ public class ManipulatorAgent : Agent
         //     }
         //     lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
         // }
-
-
-        //Debug.Log(part6.transform.position[1]);
-        if (part6.transform.position[1] < 150)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-        if (part5.transform.position[1] < 100)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-
-        if (part4.transform.position[1] < 100)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-        if (part3.transform.position[1] < 100)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-
-        if (target1.transform.position[1] < 90)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-        
     }
-
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        float maxTargetRadius = 3000f;
+        float maxTargetRadius = 2500f;
         Vector3 target1FromPart1Position = new Vector3(
                                          target1.transform.position[0] - part1.transform.position[0],
                                          target1.transform.position[1] - part1.transform.position[1],
@@ -233,6 +233,14 @@ public class ManipulatorAgent : Agent
         sensor.AddObservation(target1FromPart1Position[0]/maxTargetRadius);
         sensor.AddObservation(target1FromPart1Position[1]/maxTargetRadius);
         sensor.AddObservation(target1FromPart1Position[2]/maxTargetRadius);
+
+        Vector3 target2FromPart1Position = new Vector3(
+                                         target2.transform.position[0] - part1.transform.position[0],
+                                         target2.transform.position[1] - part1.transform.position[1],
+                                         target2.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(target2FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target2FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target2FromPart1Position[2]/maxTargetRadius);
         // sensor.AddObservation(target2.transform.position);
         // sensor.AddObservation(target3.transform.position);
         // sensor.AddObservation(target4.transform.position);
@@ -288,7 +296,7 @@ public class ManipulatorAgent : Agent
         //Debug.Log("part4 x: " + x + " y: " + y + " z: " + z);
         var action = Mathf.FloorToInt(vectorAction[0]);
         //Debug.Log(action);
-        float actionSpeed = 5.0f;
+
         switch (action)
         {
             case 0:
@@ -462,7 +470,7 @@ public class ManipulatorAgent : Agent
     }
 
     private bool useTarget1 = true;
-    private bool useTarget2 = false;
+    private bool useTarget2 = true;
     private bool useTarget3 = false;
     private bool useTarget4 = false;
     private bool useTarget5 = false;
@@ -470,12 +478,14 @@ public class ManipulatorAgent : Agent
 
     public override void OnEpisodeBegin()
     {
+        Physics.gravity = new Vector3(0, -3000.0F, 0);
         //float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
-        float distanceFromZone = 400;
+        float distanceFromZone = 0;
         //11111111111111111111111111
         Vector3 spawnTarget1 = zone.transform.position;
         float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
-        float dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone;
+        float dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone;
+        //float dist = 500;
         spawnTarget1[0] += dist * (float)Math.Cos(rad);
         spawnTarget1[1] += 101;
         spawnTarget1[2] += dist * (float)Math.Sin(rad);
@@ -553,7 +563,7 @@ public class ManipulatorAgent : Agent
         float tz = target1.transform.position[2];
         float ty = target1.transform.position[1] + 700;
 
-        float default_x = part1.transform.position[0] + 1500;
+        float default_x = part1.transform.position[0] + 1400;
         float default_z = part1.transform.position[2];
         float default_y = part1.transform.position[1] + 1000;
 
