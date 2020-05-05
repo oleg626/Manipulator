@@ -51,6 +51,17 @@ public class ManipulatorAgent : Agent
     private float distTarget1ToZone;
     private float distTarget5ToZone;
 
+    private bool useTarget1 = true;
+    private bool useTarget2 = true;
+    private bool useTarget3 = false;
+    private bool useTarget4 = false;
+    private bool useTarget5 = false;
+
+    private float posRewardApproachTarget = 0.03f;
+    private float negRewardApproachTarget = -0.05f;
+
+    private float posRewardPushTarget = 0.1f;
+    private float negRewardPushTarget = -0.1f;
     FloatPropertiesChannel m_FloatProperties;
 
     public override void Initialize()
@@ -61,9 +72,9 @@ public class ManipulatorAgent : Agent
 
     private void Update()
     {
-        AddReward(-0.01f);
+        AddReward(-0.04f);
         
-        //if (this.GetCumulativeReward() < - 500) EndEpisode();
+        //if (this.GetCumulativeReward() < - 10) EndEpisode();
         distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
@@ -83,31 +94,55 @@ public class ManipulatorAgent : Agent
         lastDistTarget5ToZone = rewardForPushingTargetFromZone(distTarget5ToZone, lastDistTarget5ToZone);
 
         rewardForApproachingTarget();
-
+        //rewardText.text = part6.transform.position[1].ToString("000000");
         //Debug.Log(part6.transform.position[1]);
-        if (part6.transform.position[1] < 150)
+        if (part6.transform.position[1] - part1.transform.position[1] < 150)
         {
             AddReward(-5.0f);
             EndEpisode();
         }
-        if (part5.transform.position[1] < 100)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-
-        if (part4.transform.position[1] < 100)
-        {
-            AddReward(-5.0f);
-            EndEpisode();
-        }
-        if (part3.transform.position[1] < 100)
+        if (part5.transform.position[1] - part1.transform.position[1]< 100)
         {
             AddReward(-5.0f);
             EndEpisode();
         }
 
-        if (target1.transform.position[1] < 90)
+        if (part4.transform.position[1] - part1.transform.position[1]< 100)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+        if (part3.transform.position[1] - part1.transform.position[1] < 100)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (target1.transform.position[1] - part1.transform.position[1] < 90)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (useTarget2 && target2.transform.position[1] - part1.transform.position[1] < 90)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (useTarget3 && target3.transform.position[1] - part1.transform.position[1] < 90)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (useTarget4 && target4.transform.position[1] - part1.transform.position[1] < 90)
+        {
+            AddReward(-5.0f);
+            EndEpisode();
+        }
+
+        if (useTarget5 && target5.transform.position[1] - part1.transform.position[1] < 90)
         {
             AddReward(-5.0f);
             EndEpisode();
@@ -122,26 +157,60 @@ public class ManipulatorAgent : Agent
             AddReward(5.0f);
             EndEpisode();
         }
-
         rewardText.text = this.GetCumulativeReward().ToString("000000");
     }
 
     public override float[] Heuristic()
     {
-        var action = new float[7];
-        return action;
+        var actionsOut = new float[1];
+        if (Input.GetKey(KeyCode.D))
+        {
+            actionsOut[0] = 1;
+        }
+        else if (Input.GetKey(KeyCode.W))
+        {
+            actionsOut[0] = 5;
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            actionsOut[0] = 2;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            actionsOut[0] = 6;
+        }
+        else if (Input.GetKey(KeyCode.U))
+        {
+            actionsOut[0] = 3;
+        }
+        else if (Input.GetKey(KeyCode.H))
+        {
+            actionsOut[0] = 4;
+        }
+        else if (Input.GetKey(KeyCode.G))
+        {
+            actionsOut[0] = 7;
+        }
+        else if (Input.GetKey(KeyCode.Y))
+        {
+            actionsOut[0] = 8;
+        }
+        else actionsOut[0] = 0;
+        return actionsOut;
+        //actionsOut[3] = Input.GetKey(KeyCode.Space) ? 1.0f : 0.0f;
     }
+
     private float rewardForPushingTargetFromZone(float distTargetToZone, float lastDistTargetToZone)
     {
         if (distTargetToZone < zone_radius)
         {
             if (distTargetToZone > lastDistTargetToZone + 1)
             {
-                AddReward(0.05f);
+                AddReward(posRewardPushTarget);
             }
-            else
+            else if (distTargetToZone < lastDistTargetToZone)
             {
-                AddReward(-0.03f);
+                AddReward(negRewardPushTarget);
             }
             lastDistTargetToZone = distTargetToZone;
         }
@@ -155,72 +224,35 @@ public class ManipulatorAgent : Agent
 
     private void rewardForApproachingTarget()
     {
-        if (distTarget1ToZone < zone_radius)
+        if (distTarget1ToZone < zone_radius && distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
         {
-            if (distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
-            {
-                AddReward(0.05f);
-            }
-            else
-            {
-                AddReward(-0.03f);
-            }
-            lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
+            AddReward(posRewardApproachTarget);
         }
-
-        //2222222222222222222222222222222222
-        if (distTarget2ToZone < zone_radius)
+        else if (distTarget2ToZone < zone_radius && distEndEffectorToTarget2 < lastDistEndEffectorToTarget2 - 1)
         {
-            if (distEndEffectorToTarget2 < lastDistEndEffectorToTarget2)
-            {
-                AddReward(0.05f);
-            }
-            else
-            {
-                AddReward(-0.03f);
-            }
-            lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
+            AddReward(posRewardApproachTarget);
         }
-        
-        // //3333333333333333333333333333333333
-        // if (distTarget3ToZone < zone_radius)
-        // {
-        //     if (distEndEffectorToTarget3 < lastDistEndEffectorToTarget3)
-        //     {
-        //         AddReward(0.1f);
-        //     }
-        //     else
-        //     {
-        //         AddReward(-0.1f);
-        //     }
-        //     lastDistEndEffectorToTarget3 = distEndEffectorToTarget3;
-        // }
-        // //444444444444444444444444444444444
-        // if (distTarget4ToZone < zone_radius)
-        // {
-        //     if (distEndEffectorToTarget4 < lastDistEndEffectorToTarget4)
-        //     {
-        //         AddReward(0.1f);
-        //     }
-        //     else
-        //     {
-        //         AddReward(-0.1f);
-        //     }
-        //     lastDistEndEffectorToTarget4 = distEndEffectorToTarget4;
-        // }
-        // //5555555555555555555555555555555
-        // if (distTarget5ToZone < zone_radius)
-        // {
-        //     if (distEndEffectorToTarget5 < lastDistEndEffectorToTarget5)
-        //     {
-        //         AddReward(0.1f);
-        //     }
-        //     else
-        //     {
-        //         AddReward(-0.1f);
-        //     }
-        //     lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
-        // }
+        else if (distTarget3ToZone < zone_radius && distEndEffectorToTarget3 < lastDistEndEffectorToTarget3 - 1)
+        {
+            AddReward(posRewardApproachTarget);
+        }
+        else if (distTarget4ToZone < zone_radius && distEndEffectorToTarget4 < lastDistEndEffectorToTarget4 - 1)
+        {
+            AddReward(posRewardApproachTarget);
+        }
+        else if (distTarget5ToZone < zone_radius && distEndEffectorToTarget5 < lastDistEndEffectorToTarget5 - 1)
+        {
+            AddReward(posRewardApproachTarget);
+        }
+        else
+        {
+            AddReward(negRewardApproachTarget);
+        }
+        lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
+        lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
+        lastDistEndEffectorToTarget3 = distEndEffectorToTarget3;
+        lastDistEndEffectorToTarget4 = distEndEffectorToTarget4;
+        lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -273,7 +305,7 @@ public class ManipulatorAgent : Agent
     private float phi6 = 0;
     private float phi61 = 0;
     private float phi62 = 0;
-
+    private bool doGrab;
     public override void OnActionReceived(float[] vectorAction)
     {
         if (float.IsNaN(vectorAction[0])
@@ -288,7 +320,6 @@ public class ManipulatorAgent : Agent
         }
         
         float x, z, y, rad_x, rad_y, rad_z, grab;
-        bool doGrab = false;
 
         x = part4.transform.position[0] - part1.transform.position[0];
         y = part4.transform.position[1] - part1.transform.position[1];
@@ -469,18 +500,14 @@ public class ManipulatorAgent : Agent
 
     }
 
-    private bool useTarget1 = true;
-    private bool useTarget2 = true;
-    private bool useTarget3 = false;
-    private bool useTarget4 = false;
-    private bool useTarget5 = false;
+
     //private float distanceFromZone = 14f;
 
     public override void OnEpisodeBegin()
     {
         Physics.gravity = new Vector3(0, -3000.0F, 0);
         //float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
-        float distanceFromZone = 0;
+        float distanceFromZone = 500;
         //11111111111111111111111111
         Vector3 spawnTarget1 = zone.transform.position;
         float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
@@ -494,70 +521,134 @@ public class ManipulatorAgent : Agent
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
         //22222222222222222222222222
-        // if (useTarget2)
-        // {
-        //     Vector3 pos = zone.transform.position;
-        //     pos[0] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-        //     pos[1] += 102;
-        //     pos[2] += UnityEngine.Random.value * distanceFromZone * 2.0f - distanceFromZone;
-        //     target2.transform.position = pos;
-        //     target2.transform.localRotation = Quaternion.identity;
-        // }
-        // else
-        // {
-        //     target2.transform.position = new Vector3(3300, 102, 0);
-        // }
-        // target2.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        // target2.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        // //333333333333333333333333333333
-        // if (useTarget3)
-        // {
-        //     Vector3 pos = zone.transform.position;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     pos[1] += 102;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     target3.transform.position = pos;
-        // }
-        // else
-        // {
-        //     target3.transform.position = new Vector3(3600, 102, 0);
-        // }
-        // target3.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        // target3.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        if (useTarget2) 
+        { 
+            rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += dist * (float)Math.Cos(rad); 
+            pos[1] += 101; 
+            pos[2] += dist * (float)Math.Sin(rad); 
+            target2.transform.position = pos; 
+            target2.transform.localRotation = Quaternion.identity; 
+ 
+            while (Vector3.Distance(target1.transform.position, target2.transform.position) < 220) 
+            { 
+                rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                pos = zone.transform.position; 
+                pos[0] += dist * (float)Math.Cos(rad); 
+                pos[1] += 101; 
+                pos[2] += dist * (float)Math.Sin(rad); 
+                target2.transform.position = pos; 
+                target2.transform.localRotation = Quaternion.identity; 
+            } 
+        } 
+        else 
+        { 
+            target2.SetActive(false); 
+        } 
+        target2.GetComponent<Rigidbody>().velocity = Vector3.zero; 
+        target2.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
+
+        //333333333333333333333333333333
+        if (useTarget3) 
+        { 
+            rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += dist * (float)Math.Cos(rad); 
+            pos[1] += 101; 
+            pos[2] += dist * (float)Math.Sin(rad); 
+            target3.transform.position = pos; 
+            target3.transform.localRotation = Quaternion.identity; 
+ 
+            while (Vector3.Distance(target1.transform.position, target3.transform.position) < 220 ||
+                   Vector3.Distance(target2.transform.position, target3.transform.position) < 220) 
+            { 
+                rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                pos = zone.transform.position; 
+                pos[0] += dist * (float)Math.Cos(rad); 
+                pos[1] += 101; 
+                pos[2] += dist * (float)Math.Sin(rad); 
+                target3.transform.position = pos; 
+                target3.transform.localRotation = Quaternion.identity; 
+            } 
+        } 
+        else 
+        { 
+            target3.SetActive(false); 
+        } 
+        target3.GetComponent<Rigidbody>().velocity = Vector3.zero; 
+        target3.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
         // //444444444444444444444444444444444
-        // if (useTarget4)
-        // {
-        //     Vector3 pos = zone.transform.position;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     pos[1] += 102;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     target4.transform.position = pos;
-        // }
-        // else
-        // {
-        //     target4.transform.position = new Vector3(3900, 102, 0);
-        // }
-        // target4.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        // target4.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        // //555555555555555555555555555555
-        // if (useTarget5)
-        // {
-        //     Vector3 pos = zone.transform.position;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     pos[1] += 102;
-        //     pos[0] += UnityEngine.Random.Range(-distanceFromZone, distanceFromZone);
-        //     target5.transform.position = pos;
-        // }
-        // else
-        // {
-        //     target5.transform.position = new Vector3(4200, 102, 0);
-        // }
-        // target5.GetComponent<Rigidbody>().velocity = Vector3.zero;  
-        // target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-        target2.SetActive(false);
-        target3.SetActive(false);
-        target4.SetActive(false);
-        target5.SetActive(false);
+        if (useTarget4) 
+        { 
+            rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += dist * (float)Math.Cos(rad); 
+            pos[1] += 101; 
+            pos[2] += dist * (float)Math.Sin(rad); 
+            target4.transform.position = pos; 
+            target4.transform.localRotation = Quaternion.identity; 
+ 
+            while (Vector3.Distance(target1.transform.position, target4.transform.position) < 220 ||
+                   Vector3.Distance(target2.transform.position, target4.transform.position) < 220 ||
+                   Vector3.Distance(target3.transform.position, target4.transform.position) < 220) 
+            { 
+                rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                pos = zone.transform.position; 
+                pos[0] += dist * (float)Math.Cos(rad); 
+                pos[1] += 101; 
+                pos[2] += dist * (float)Math.Sin(rad); 
+                target4.transform.position = pos; 
+                target4.transform.localRotation = Quaternion.identity; 
+            } 
+        } 
+        else 
+        { 
+            target4.SetActive(false); 
+        } 
+        target4.GetComponent<Rigidbody>().velocity = Vector3.zero; 
+        target4.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
+
+        //555555555555555555555555555555
+        if (useTarget5) 
+        { 
+            rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += dist * (float)Math.Cos(rad); 
+            pos[1] += 101; 
+            pos[2] += dist * (float)Math.Sin(rad); 
+            target5.transform.position = pos; 
+            target5.transform.localRotation = Quaternion.identity; 
+ 
+            while (Vector3.Distance(target1.transform.position, target5.transform.position) < 220 ||
+                   Vector3.Distance(target2.transform.position, target5.transform.position) < 220 ||
+                   Vector3.Distance(target3.transform.position, target5.transform.position) < 220 ||
+                   Vector3.Distance(target4.transform.position, target5.transform.position) < 220) 
+            { 
+                rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
+                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                pos = zone.transform.position; 
+                pos[0] += dist * (float)Math.Cos(rad); 
+                pos[1] += 101; 
+                pos[2] += dist * (float)Math.Sin(rad); 
+                target5.transform.position = pos; 
+                target5.transform.localRotation = Quaternion.identity; 
+            } 
+        } 
+        else 
+        { 
+            target5.SetActive(false); 
+        } 
+        target5.GetComponent<Rigidbody>().velocity = Vector3.zero; 
+        target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
+
 
         float tx = target1.transform.position[0];
         float tz = target1.transform.position[2];
