@@ -15,7 +15,7 @@ public class ManipulatorAgent : Agent
 
     public GameObject part1, part2, part3, part4, part5, part6, part61, part62, target1, target2, target3, target4, target5, zone, cube;
     public TextMeshPro rewardText;
-    public float actionSpeed = 5.0f;
+    public float actionSpeed = 10.0f;
     public float speed;
     public float part2_min =  0;
     public float part2_max =  90;
@@ -25,7 +25,7 @@ public class ManipulatorAgent : Agent
     public float part5_max =  100;
     public float end_min = 1;
     public float end_max =  60;
-    public float zone_radius = 750;
+    public float zone_radius = 650;
 
     private float lastDistTarget1ToZone = 1000000;
     private float lastDistTarget2ToZone = 1000000;
@@ -52,16 +52,16 @@ public class ManipulatorAgent : Agent
     private float distTarget5ToZone;
 
     private bool useTarget1 = true;
-    private bool useTarget2 = true;
+    private bool useTarget2 = false;
     private bool useTarget3 = false;
     private bool useTarget4 = false;
     private bool useTarget5 = false;
 
     private float posRewardApproachTarget = 0.03f;
     private float negRewardApproachTarget = -0.05f;
-
-    private float posRewardPushTarget = 0.1f;
-    private float negRewardPushTarget = -0.1f;
+    private bool doUpdate = false;
+    private float posRewardPushTarget = 0.5f;
+    private float negRewardPushTarget = -0.5f;
     FloatPropertiesChannel m_FloatProperties;
 
     public override void Initialize()
@@ -72,10 +72,14 @@ public class ManipulatorAgent : Agent
 
     private void Update()
     {
-        AddReward(-0.04f);
-        
-        //if (this.GetCumulativeReward() < - 10) EndEpisode();
-        distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
+        if (doUpdate)
+        {
+            useTarget2 = (Academy.Instance.FloatProperties.GetPropertyWithDefault("secondObject", 0) != 0);
+            //Debug.Log("Update called");
+            AddReward(-0.05f);
+            
+            //if (this.GetCumulativeReward() < - 10) EndEpisode();
+            distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
         distEndEffectorToTarget2 = Vector3.Distance(part6.transform.position, target2.transform.position);
         distEndEffectorToTarget3 = Vector3.Distance(part6.transform.position, target3.transform.position);
         distEndEffectorToTarget4 = Vector3.Distance(part6.transform.position, target4.transform.position);
@@ -154,10 +158,12 @@ public class ManipulatorAgent : Agent
             lastDistTarget4ToZone > zone_radius &&
             lastDistTarget5ToZone > zone_radius)
         {
-            AddReward(5.0f);
-            EndEpisode();
+                AddReward(5.0f);
+                EndEpisode();
+            }
+            rewardText.text = this.GetCumulativeReward().ToString("000.0");
+            doUpdate = false;
         }
-        rewardText.text = this.GetCumulativeReward().ToString("000000");
     }
 
     public override float[] Heuristic()
@@ -206,9 +212,9 @@ public class ManipulatorAgent : Agent
         {
             if (distTargetToZone > lastDistTargetToZone + 1)
             {
-                AddReward(posRewardPushTarget);
+                AddReward(posRewardPushTarget * distTargetToZone / zone_radius);
             }
-            else if (distTargetToZone < lastDistTargetToZone)
+            else if (distTargetToZone < lastDistTargetToZone - 1)
             {
                 AddReward(negRewardPushTarget);
             }
@@ -216,7 +222,7 @@ public class ManipulatorAgent : Agent
         }
         else if (lastDistTargetToZone < zone_radius)
         {
-            AddReward(1.0f);
+            AddReward(5.0f);
             lastDistTargetToZone = distTargetToZone;
         }
         return lastDistTargetToZone;
@@ -224,6 +230,9 @@ public class ManipulatorAgent : Agent
 
     private void rewardForApproachingTarget()
     {
+        //Debug.Log("distTarget1ToZone = " + distTarget1ToZone);
+        //Debug.Log("distEndEffectorToTarget1 = " + distEndEffectorToTarget1);
+        //Debug.Log("lastDistEndEffectorToTarget1 = " + lastDistEndEffectorToTarget1);
         if (distTarget1ToZone < zone_radius && distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
         {
             AddReward(posRewardApproachTarget);
@@ -285,7 +294,7 @@ public class ManipulatorAgent : Agent
         sensor.AddObservation(part4FromPart1Position[0]/maxTargetRadius);
         sensor.AddObservation(part4FromPart1Position[1]/maxTargetRadius);
         sensor.AddObservation(part4FromPart1Position[2]/maxTargetRadius);
-        sensor.AddObservation(part61.transform.rotation[2]);
+        sensor.AddObservation(part61.transform.rotation[2] / 60);
         //sensor.AddObservation(part6.transform.rotation);
         Vector3 zoneFromPart1Position = new Vector3(
                                       zone.transform.position[0] - part1.transform.position[0],
@@ -308,6 +317,8 @@ public class ManipulatorAgent : Agent
     private bool doGrab;
     public override void OnActionReceived(float[] vectorAction)
     {
+        doUpdate = true;
+        //Debug.Log("On action received");
         if (float.IsNaN(vectorAction[0])
             //float.IsNaN(vectorAction[1])||
             //float.IsNaN(vectorAction[2])
@@ -325,10 +336,13 @@ public class ManipulatorAgent : Agent
         y = part4.transform.position[1] - part1.transform.position[1];
         z = part4.transform.position[2] - part1.transform.position[2];
         //Debug.Log("part4 x: " + x + " y: " + y + " z: " + z);
-        var action = Mathf.FloorToInt(vectorAction[0]);
+        var actionX = Mathf.FloorToInt(vectorAction[0]);
+        var actionY = Mathf.FloorToInt(vectorAction[1]);
+        var actionZ = Mathf.FloorToInt(vectorAction[2]);
+        var actionGrab = Mathf.FloorToInt(vectorAction[3]);
         //Debug.Log(action);
 
-        switch (action)
+        switch (actionX)
         {
             case 0:
                 // do nothing
@@ -341,26 +355,53 @@ public class ManipulatorAgent : Agent
                 // x-
                 x -= actionSpeed;
                 break;
-            case 3:
+            default:
+                throw new ArgumentException("Invalid action value");
+        }
+
+        switch(actionY)
+        {
+            case 0:
+                // do nothing
+                break;
+            case 1:
                 // y+
                 y += actionSpeed;
                 break;
-            case 4:
+            case 2:
                 // y-
                 y -= actionSpeed;
                 break;
-            case 5:
+            default:
+                throw new ArgumentException("Invalid action value");
+        }
+
+        switch(actionZ)
+        {
+            case 0:
+                // do nothing
+                break;
+            case 1:
                 // z+
                 z += actionSpeed;
                 break;
-            case 6:
+            case 2:
                 // z-
                 z -= actionSpeed;
                 break;
-            case 7:
+            default:
+                throw new ArgumentException("Invalid action value");
+        }
+
+        switch(actionGrab)
+        {
+            case 0:
+                // do nothing
+                break;
+            case 1:
                 doGrab = true;
                 break;
-            case 8:
+            case 2:
                 doGrab = false;
                 break;
             default:
@@ -545,8 +586,12 @@ public class ManipulatorAgent : Agent
             } 
         } 
         else 
-        { 
-            target2.SetActive(false); 
+        {
+            Vector3 pos = zone.transform.position; 
+            pos[0] += 1000;
+            pos[1] += 100;
+            pos[2] += 0;
+            target2.transform.position = pos;
         } 
         target2.GetComponent<Rigidbody>().velocity = Vector3.zero; 
         target2.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
@@ -578,7 +623,11 @@ public class ManipulatorAgent : Agent
         } 
         else 
         { 
-            target3.SetActive(false); 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += 1000;
+            pos[1] += 100;
+            pos[2] += 300;
+            target3.transform.position = pos;
         } 
         target3.GetComponent<Rigidbody>().velocity = Vector3.zero; 
         target3.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
@@ -610,7 +659,11 @@ public class ManipulatorAgent : Agent
         } 
         else 
         { 
-            target4.SetActive(false); 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += 1000;
+            pos[1] += 100;
+            pos[2] += 600;
+            target4.transform.position = pos;
         } 
         target4.GetComponent<Rigidbody>().velocity = Vector3.zero; 
         target4.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
@@ -644,7 +697,11 @@ public class ManipulatorAgent : Agent
         } 
         else 
         { 
-            target5.SetActive(false); 
+            Vector3 pos = zone.transform.position; 
+            pos[0] += 1000;
+            pos[1] += 100;
+            pos[2] += 900;
+            target5.transform.position = pos;
         } 
         target5.GetComponent<Rigidbody>().velocity = Vector3.zero; 
         target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
