@@ -56,6 +56,7 @@ public class ManipulatorAgent : Agent
     private bool useTarget3 = true;
     private bool useTarget4 = true;
     private bool useTarget5 = true;
+    private bool useCurricula = true;
 
     private float posRewardApproachTarget = 0.03f;
     private float negRewardApproachTarget = -0.05f;
@@ -577,12 +578,53 @@ public class ManipulatorAgent : Agent
     public override void OnEpisodeBegin()
     {
         Physics.gravity = new Vector3(0, -3000.0F, 0);
-        float distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
-        //float distanceFromZone = 500;
+        // float offset1 = 200;
+        // float offset2 = 200;
+        // float offset3 = 200;
+        // float offset4 = 200;
+        // float offset5 = 200;
+
+        float offset1 = 0;
+        float offset2 = 0;
+        float offset3 = 0;
+        float offset4 = 0;
+        float offset5 = 0;
+
+        float distanceFromZone = 500;
+        if (useCurricula)
+        {
+            distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+        } 
+        
+        
+        float whichTarget = UnityEngine.Random.value;
+        if (useTarget2)
+        {
+            if (whichTarget < 0.2)
+            {
+                offset1 = 0;
+            }
+            else if (whichTarget < 0.4)
+            {
+                offset2 = 0;
+            }
+            else if (whichTarget < 0.6)
+            {
+                offset3 = 0;
+            }
+            else if (whichTarget < 0.8)
+            {
+                offset4 = 0;
+            }
+            else offset5 = 0;
+        }
+        else offset1 = 0;
+
+
         //11111111111111111111111111
         Vector3 spawnTarget1 = zone.transform.position;
         float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
-        float dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone;
+        float dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset1;
         //float dist = 500;
         spawnTarget1[0] += dist * (float)Math.Cos(rad);
         spawnTarget1[1] += 101;
@@ -595,7 +637,7 @@ public class ManipulatorAgent : Agent
         if (useTarget2) 
         { 
             rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset2; 
             Vector3 pos = zone.transform.position; 
             pos[0] += dist * (float)Math.Cos(rad); 
             pos[1] += 101; 
@@ -606,7 +648,7 @@ public class ManipulatorAgent : Agent
             while (Vector3.Distance(target1.transform.position, target2.transform.position) < 220) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset2; 
                 pos = zone.transform.position; 
                 pos[0] += dist * (float)Math.Cos(rad); 
                 pos[1] += 101; 
@@ -630,7 +672,7 @@ public class ManipulatorAgent : Agent
         if (useTarget3) 
         { 
             rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset3; 
             Vector3 pos = zone.transform.position; 
             pos[0] += dist * (float)Math.Cos(rad); 
             pos[1] += 101; 
@@ -642,7 +684,7 @@ public class ManipulatorAgent : Agent
                    Vector3.Distance(target2.transform.position, target3.transform.position) < 220) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset3; 
                 pos = zone.transform.position; 
                 pos[0] += dist * (float)Math.Cos(rad); 
                 pos[1] += 101; 
@@ -665,7 +707,7 @@ public class ManipulatorAgent : Agent
         if (useTarget4) 
         { 
             rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset4; 
             Vector3 pos = zone.transform.position; 
             pos[0] += dist * (float)Math.Cos(rad); 
             pos[1] += 101; 
@@ -678,7 +720,7 @@ public class ManipulatorAgent : Agent
                    Vector3.Distance(target3.transform.position, target4.transform.position) < 220) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset4; 
                 pos = zone.transform.position; 
                 pos[0] += dist * (float)Math.Cos(rad); 
                 pos[1] += 101; 
@@ -702,7 +744,7 @@ public class ManipulatorAgent : Agent
         if (useTarget5) 
         { 
             rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-            dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+            dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset5; 
             Vector3 pos = zone.transform.position; 
             pos[0] += dist * (float)Math.Cos(rad); 
             pos[1] += 101; 
@@ -716,7 +758,7 @@ public class ManipulatorAgent : Agent
                    Vector3.Distance(target4.transform.position, target5.transform.position) < 220) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
-                dist = zone_radius - 100 - UnityEngine.Random.value * distanceFromZone; 
+                dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset5; 
                 pos = zone.transform.position; 
                 pos[0] += dist * (float)Math.Cos(rad); 
                 pos[1] += 101; 
@@ -736,39 +778,49 @@ public class ManipulatorAgent : Agent
         target5.GetComponent<Rigidbody>().velocity = Vector3.zero; 
         target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
 
-        float whichTarget = UnityEngine.Random.value;
+
 
         float tx, ty, tz;
-        if (whichTarget < 0.2)
+        if (useTarget2)
+        {
+            if (whichTarget < 0.2)
+            {
+                tx = target1.transform.position[0];
+                tz = target1.transform.position[2];
+                ty = target1.transform.position[1] + 700;
+            }
+            else if (whichTarget < 0.4)
+            {
+                tx = target2.transform.position[0];
+                tz = target2.transform.position[2];
+                ty = target2.transform.position[1] + 700;
+            }
+            else if (whichTarget < 0.6)
+            {
+                tx = target3.transform.position[0];
+                tz = target3.transform.position[2];
+                ty = target3.transform.position[1] + 700;
+            }
+            else if (whichTarget < 0.8)
+            {
+                tx = target4.transform.position[0];
+                tz = target4.transform.position[2];
+                ty = target4.transform.position[1] + 700;
+            }
+            else
+            {
+                tx = target5.transform.position[0];
+                tz = target5.transform.position[2];
+                ty = target5.transform.position[1] + 700;
+            }
+        }
+        else
         {
             tx = target1.transform.position[0];
             tz = target1.transform.position[2];
             ty = target1.transform.position[1] + 700;
         }
-        else if (whichTarget < 0.4)
-        {
-            tx = target2.transform.position[0];
-            tz = target2.transform.position[2];
-            ty = target2.transform.position[1] + 700;
-        }
-        else if (whichTarget < 0.6)
-        {
-            tx = target3.transform.position[0];
-            tz = target3.transform.position[2];
-            ty = target3.transform.position[1] + 700;
-        }
-        else if (whichTarget < 0.8)
-        {
-            tx = target4.transform.position[0];
-            tz = target4.transform.position[2];
-            ty = target4.transform.position[1] + 700;
-        }
-        else
-        {
-            tx = target5.transform.position[0];
-            tz = target5.transform.position[2];
-            ty = target5.transform.position[1] + 700;
-        }
+
 
 
         float default_x = part1.transform.position[0] + 1400;
@@ -779,8 +831,12 @@ public class ManipulatorAgent : Agent
         float dy = ty - default_y;
         float dz = tz - default_z;
 
-//        float close_coeff = 0;
-        float close_coeff = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff", 1.0f);
+        float close_coeff = 0;
+        if (useCurricula)
+        {
+            close_coeff = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff", 1.0f);
+        }
+        
         //Debug.Log(close_coeff);
         float[] tpos = {default_x + dx * close_coeff - part1.transform.position[0], 
                         default_z + dz * close_coeff - part1.transform.position[2], 
