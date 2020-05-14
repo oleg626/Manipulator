@@ -106,6 +106,12 @@ public class ManipulatorAgent : Agent
                 AddReward(-5.0f);
                 EndEpisode();
             }
+
+            if (part6.transform.position[1] - part1.transform.position[1] < 200)
+            {
+                AddReward(-1.0f);
+            }
+
             if (part5.transform.position[1] - part1.transform.position[1]< 100)
             {
                 AddReward(-5.0f);
@@ -210,7 +216,7 @@ public class ManipulatorAgent : Agent
         {
             actionsOut[3] = 2;
         }
-        else actionsOut[0] = 0;
+        else actionsOut[3] = 0;
 
         return actionsOut;
         //actionsOut[3] = Input.GetKey(KeyCode.Space) ? 1.0f : 0.0f;
@@ -400,8 +406,11 @@ public class ManipulatorAgent : Agent
                 y += actionSpeed;
                 break;
             case 2:
+                if (y > 600)
+                {
                 // y-
-                y -= actionSpeed;
+                    y -= actionSpeed;
+                }
                 break;
             default:
                 throw new ArgumentException("Invalid action value");
@@ -438,6 +447,8 @@ public class ManipulatorAgent : Agent
             default:
                 throw new ArgumentException("Invalid action value");
         }
+
+        if (y < 600) y = 600;
         //Debug.Log(x + " " + y + " " + z);
         // x = vectorAction[0] * 3000;
         // y = vectorAction[1] * 3000;
@@ -779,7 +790,7 @@ public class ManipulatorAgent : Agent
         target5.GetComponent<Rigidbody>().angularVelocity = Vector3.zero; 
 
 
-
+        float onTop = 900;
         float tx, ty, tz;
         if (useTarget2)
         {
@@ -787,38 +798,38 @@ public class ManipulatorAgent : Agent
             {
                 tx = target1.transform.position[0];
                 tz = target1.transform.position[2];
-                ty = target1.transform.position[1] + 700;
+                ty = target1.transform.position[1] + onTop;
             }
             else if (whichTarget < 0.4)
             {
                 tx = target2.transform.position[0];
                 tz = target2.transform.position[2];
-                ty = target2.transform.position[1] + 700;
+                ty = target2.transform.position[1] + onTop;
             }
             else if (whichTarget < 0.6)
             {
                 tx = target3.transform.position[0];
                 tz = target3.transform.position[2];
-                ty = target3.transform.position[1] + 700;
+                ty = target3.transform.position[1] + onTop;
             }
             else if (whichTarget < 0.8)
             {
                 tx = target4.transform.position[0];
                 tz = target4.transform.position[2];
-                ty = target4.transform.position[1] + 700;
+                ty = target4.transform.position[1] + onTop;
             }
             else
             {
                 tx = target5.transform.position[0];
                 tz = target5.transform.position[2];
-                ty = target5.transform.position[1] + 700;
+                ty = target5.transform.position[1] + onTop;
             }
         }
         else
         {
             tx = target1.transform.position[0];
             tz = target1.transform.position[2];
-            ty = target1.transform.position[1] + 700;
+            ty = target1.transform.position[1] + onTop;
         }
 
 
