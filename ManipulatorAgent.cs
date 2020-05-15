@@ -52,10 +52,10 @@ public class ManipulatorAgent : Agent
     private float distTarget5ToZone;
 
     private bool useTarget1 = true;
-    private bool useTarget2 = true;
-    private bool useTarget3 = true;
-    private bool useTarget4 = true;
-    private bool useTarget5 = true;
+    private bool useTarget2 = false;
+    private bool useTarget3 = false;
+    private bool useTarget4 = false;
+    private bool useTarget5 = false;
     private bool useCurricula = true;
 
     private float posRewardApproachTarget = 0.03f;
@@ -352,6 +352,7 @@ public class ManipulatorAgent : Agent
     private float phi61 = 0;
     private float phi62 = 0;
     private bool doGrab;
+
     public override void OnActionReceived(float[] vectorAction)
     {
         doUpdate = true;
@@ -588,6 +589,31 @@ public class ManipulatorAgent : Agent
 
     public override void OnEpisodeBegin()
     {
+        if (useCurricula)
+        {
+            float phase = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("phase", 1);
+            switch(phase)
+            {
+                case 1:
+                {
+                    useTarget1 = true;
+                    break;
+                }
+                case 2:
+                {
+                    useTarget1 = false;
+                    useTarget2 = true;
+                    break;
+                }
+                case 3:
+                {
+                    useTarget1 = true;
+                    useTarget2 = true;
+                    break;
+                }
+            }
+        }
+
         Physics.gravity = new Vector3(0, -3000.0F, 0);
         // float offset1 = 200;
         // float offset2 = 200;
@@ -604,7 +630,7 @@ public class ManipulatorAgent : Agent
         float distanceFromZone = 500;
         if (useCurricula)
         {
-            distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+            //distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
         } 
         
         
@@ -633,14 +659,28 @@ public class ManipulatorAgent : Agent
 
 
         //11111111111111111111111111
-        Vector3 spawnTarget1 = zone.transform.position;
         float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
         float dist = zone_radius - 50 - UnityEngine.Random.value * distanceFromZone + offset1;
-        //float dist = 500;
-        spawnTarget1[0] += dist * (float)Math.Cos(rad);
-        spawnTarget1[1] += 101;
-        spawnTarget1[2] += dist * (float)Math.Sin(rad);
-        target1.transform.position = spawnTarget1;
+        if (useTarget1)
+        {
+
+            Vector3 spawnTarget1 = zone.transform.position;
+
+
+            //float dist = 500;
+            spawnTarget1[0] += dist * (float)Math.Cos(rad);
+            spawnTarget1[1] += 101;
+            spawnTarget1[2] += dist * (float)Math.Sin(rad);
+            target1.transform.position = spawnTarget1;
+        }
+        else
+        {
+            Vector3 pos = zone.transform.position; 
+            pos[0] += 1000;
+            pos[1] += 100;
+            pos[2] -= 300;
+            target1.transform.position = pos;
+        } 
         target1.GetComponent<Rigidbody>().velocity = Vector3.zero;
         target1.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -845,7 +885,7 @@ public class ManipulatorAgent : Agent
         float close_coeff = 0;
         if (useCurricula)
         {
-            close_coeff = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff", 1.0f);
+            //close_coeff = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff", 1.0f);
         }
         
         //Debug.Log(close_coeff);
