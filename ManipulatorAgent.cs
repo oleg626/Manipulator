@@ -306,128 +306,45 @@ public class ManipulatorAgent : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         float maxTargetRadius = 2500f;
-
         Vector3 target1FromPart1Position = new Vector3(
                                          target1.transform.position[0] - part1.transform.position[0],
                                          target1.transform.position[1] - part1.transform.position[1],
                                          target1.transform.position[2] - part1.transform.position[2]);
-                                         
+        sensor.AddObservation(target1FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target1FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target1FromPart1Position[2]/maxTargetRadius);
+
         Vector3 target2FromPart1Position = new Vector3(
                                          target2.transform.position[0] - part1.transform.position[0],
                                          target2.transform.position[1] - part1.transform.position[1],
                                          target2.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(target2FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target2FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target2FromPart1Position[2]/maxTargetRadius);
 
         Vector3 target3FromPart1Position = new Vector3(
                                          target3.transform.position[0] - part1.transform.position[0],
                                          target3.transform.position[1] - part1.transform.position[1],
                                          target3.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(target3FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target3FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target3FromPart1Position[2]/maxTargetRadius);
 
         Vector3 target4FromPart1Position = new Vector3(
                                          target4.transform.position[0] - part1.transform.position[0],
                                          target4.transform.position[1] - part1.transform.position[1],
                                          target4.transform.position[2] - part1.transform.position[2]);
+        sensor.AddObservation(target4FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target4FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target4FromPart1Position[2]/maxTargetRadius);
 
         Vector3 target5FromPart1Position = new Vector3(
                                          target5.transform.position[0] - part1.transform.position[0],
                                          target5.transform.position[1] - part1.transform.position[1],
                                          target5.transform.position[2] - part1.transform.position[2]);
-
-        float closestTarget = 1;
-        float minDistance = 10000;
-        if (distEndEffectorToTarget1 < minDistance && distTarget1ToZone < zone_radius && useTarget1)
-        {
-            minDistance = distEndEffectorToTarget1;
-            closestTarget = 1;
-        }
-
-        if (distEndEffectorToTarget2 < minDistance  && distTarget2ToZone < zone_radius  && useTarget2)
-        {
-            minDistance = distEndEffectorToTarget2;
-            closestTarget = 2;
-        }
-
-        if (distEndEffectorToTarget3 < minDistance  && distTarget3ToZone < zone_radius  && useTarget3)
-        {
-            minDistance = distEndEffectorToTarget3;
-            closestTarget = 3;
-        }
-
-        if (distEndEffectorToTarget4 < minDistance  && distTarget4ToZone < zone_radius  && useTarget4)
-        {
-            minDistance = distEndEffectorToTarget4;
-            closestTarget = 4;
-        }
-
-        if (distEndEffectorToTarget5 < minDistance  && distTarget5ToZone < zone_radius  && useTarget5)
-        {
-            minDistance = distEndEffectorToTarget5;
-            closestTarget = 5;
-        }
-
-        switch(closestTarget)
-        {
-            case 1:
-            {
-                sensor.AddObservation(target1FromPart1Position[0]/maxTargetRadius);
-                sensor.AddObservation(target1FromPart1Position[1]/maxTargetRadius);
-                sensor.AddObservation(target1FromPart1Position[2]/maxTargetRadius);
-                break;
-            }
-
-            case 2:
-            {
-                sensor.AddObservation(target2FromPart1Position[0]/maxTargetRadius);
-                sensor.AddObservation(target2FromPart1Position[1]/maxTargetRadius);
-                sensor.AddObservation(target2FromPart1Position[2]/maxTargetRadius);
-                break;
-            }
-
-            case 3:
-            {
-                sensor.AddObservation(target3FromPart1Position[0]/maxTargetRadius);
-                sensor.AddObservation(target3FromPart1Position[1]/maxTargetRadius);
-                sensor.AddObservation(target3FromPart1Position[2]/maxTargetRadius);
-                break;
-            }
-
-            case 4:
-            {
-                sensor.AddObservation(target4FromPart1Position[0]/maxTargetRadius);
-                sensor.AddObservation(target4FromPart1Position[1]/maxTargetRadius);
-                sensor.AddObservation(target4FromPart1Position[2]/maxTargetRadius);
-                break;
-            }
-
-            case 5:
-            {
-                sensor.AddObservation(target5FromPart1Position[0]/maxTargetRadius);
-                sensor.AddObservation(target5FromPart1Position[1]/maxTargetRadius);
-                sensor.AddObservation(target5FromPart1Position[2]/maxTargetRadius);
-                break;
-            }
-        }
-        // sensor.AddObservation(target1FromPart1Position[0]/maxTargetRadius);
-        // sensor.AddObservation(target1FromPart1Position[1]/maxTargetRadius);
-        // sensor.AddObservation(target1FromPart1Position[2]/maxTargetRadius);
-
-        // sensor.AddObservation(target2FromPart1Position[0]/maxTargetRadius);
-        // sensor.AddObservation(target2FromPart1Position[1]/maxTargetRadius);
-        // sensor.AddObservation(target2FromPart1Position[2]/maxTargetRadius);
-
-
-        // sensor.AddObservation(target3FromPart1Position[0]/maxTargetRadius);
-        // sensor.AddObservation(target3FromPart1Position[1]/maxTargetRadius);
-        // sensor.AddObservation(target3FromPart1Position[2]/maxTargetRadius);
-
-
-        // sensor.AddObservation(target4FromPart1Position[0]/maxTargetRadius);
-        // sensor.AddObservation(target4FromPart1Position[1]/maxTargetRadius);
-        // sensor.AddObservation(target4FromPart1Position[2]/maxTargetRadius);
-
-
-        // sensor.AddObservation(target5FromPart1Position[0]/maxTargetRadius);
-        // sensor.AddObservation(target5FromPart1Position[1]/maxTargetRadius);
-        // sensor.AddObservation(target5FromPart1Position[2]/maxTargetRadius);
+        sensor.AddObservation(target5FromPart1Position[0]/maxTargetRadius);
+        sensor.AddObservation(target5FromPart1Position[1]/maxTargetRadius);
+        sensor.AddObservation(target5FromPart1Position[2]/maxTargetRadius);
 
         Vector3 part4FromPart1Position = new Vector3(
                                        part4.transform.position[0] - part1.transform.position[0],
