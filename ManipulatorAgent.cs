@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
-using MLAgents.Sensors;
-using MLAgents.SideChannels;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.SideChannels;
 using Barracuda;
 using TMPro;
 using System;
@@ -30,7 +30,7 @@ public class ManipulatorAgent : Agent
     public float part5_min = -100;
     public float part5_max =  100;
     public float end_min = 1;
-    public float end_max =  60;
+    public float end_max =  40;
     public float zone_radius = 650;
 
     private float lastDistTarget1ToZone = 1000000;
@@ -99,7 +99,7 @@ public class ManipulatorAgent : Agent
         {
             //useTarget2 = (Academy.Instance.FloatProperties.GetPropertyWithDefault("secondObject", 0) != 0);
             //Debug.Log("Update called");
-            AddReward(-0.05f);
+            AddReward(-0.04f);
             
             //if (this.GetCumulativeReward() < - 10) EndEpisode();
             distEndEffectorToTarget1 = Vector3.Distance(part6.transform.position, target1.transform.position);
@@ -151,33 +151,33 @@ public class ManipulatorAgent : Agent
                 EndEpisode();
             }
 
-            if (target1.transform.position[1] - part1.transform.position[1] < 65)
+            if (target1.transform.position[1] - part1.transform.position[1] < 50 && distTarget1ToZone < 850)
             {
-                AddReward(-5.0f);
+                AddReward(-100.0f);
                 EndEpisode();
             }
 
-            if (useTarget2 && target2.transform.position[1] - part1.transform.position[1] < 65)
+            if (useTarget2 && target2.transform.position[1] - part1.transform.position[1] < 50  && distTarget2ToZone < 850)
             {
-                AddReward(-5.0f);
+                AddReward(-100.0f);
                 EndEpisode();
             }
 
-            if (useTarget3 && target3.transform.position[1] - part1.transform.position[1] < 65)
+            if (useTarget3 && target3.transform.position[1] - part1.transform.position[1] < 50  && distTarget3ToZone < 850)
             {
-                AddReward(-5.0f);
+                AddReward(-100.0f);
                 EndEpisode();
             }
 
-            if (useTarget4 && target4.transform.position[1] - part1.transform.position[1] < 65)
+            if (useTarget4 && target4.transform.position[1] - part1.transform.position[1] < 50  && distTarget4ToZone < 850)
             {
-                AddReward(-5.0f);
+                AddReward(-100.0f);
                 EndEpisode();
             }
 
-            if (useTarget5 && target5.transform.position[1] - part1.transform.position[1] < 65)
+            if (useTarget5 && target5.transform.position[1] - part1.transform.position[1] < 50  && distTarget5ToZone < 850)
             {
-                AddReward(-5.0f);
+                AddReward(-100.0f);
                 EndEpisode();
             }
 
@@ -195,9 +195,8 @@ public class ManipulatorAgent : Agent
         }
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(float[] actionsOut)
     {
-        var actionsOut = new float[4];
         if (Input.GetKey(KeyCode.D))
         {
             actionsOut[0] = 1;
@@ -240,7 +239,6 @@ public class ManipulatorAgent : Agent
         }
         else actionsOut[3] = 0;
 
-        return actionsOut;
         //actionsOut[3] = Input.GetKey(KeyCode.Space) ? 1.0f : 0.0f;
     }
 
@@ -591,13 +589,13 @@ public class ManipulatorAgent : Agent
             /****************end effector *************************/
             if (doGrab)
             {
-                if (phi61 > end_min) phi61 -= speed*2;
-                if (phi62 < -end_min) phi62 += speed*2;
+                if (phi61 > end_min) phi61 -= speed*4;
+                if (phi62 < -end_min) phi62 += speed*4;
             }
             else
             {
-                if (phi61 < end_max) phi61 += speed*2;
-                if (phi62 > -end_max) phi62 -= speed*2;
+                if (phi61 < end_max) phi61 += speed*4;
+                if (phi62 > -end_max) phi62 -= speed*4;
             }
             part61.transform.localRotation = Quaternion.Euler(0, 0, phi61);
             part62.transform.localRotation = Quaternion.Euler(0, 0, phi62);
