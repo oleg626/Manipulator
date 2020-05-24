@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.SideChannels;
-using Barracuda;
 using TMPro;
 using System;
 using System.Threading;
@@ -45,6 +44,12 @@ public class ManipulatorAgent : Agent
     private float lastDistEndEffectorToTarget4 = 1000000;
     private float lastDistEndEffectorToTarget5 = 1000000;
 
+    private float lastHeight1 = 0;
+    private float lastHeight2 = 0;
+    private float lastHeight3 = 0;
+    private float lastHeight4 = 0;
+    private float lastHeight5 = 0;
+
     private float distEndEffectorToTarget1;
     private float distEndEffectorToTarget2;
     private float distEndEffectorToTarget3;
@@ -62,15 +67,16 @@ public class ManipulatorAgent : Agent
     private bool useTarget3 = false;
     private bool useTarget4 = false;
     private bool useTarget5 = false;
-    private bool useCurricula = true;
+    private bool useCurricula = false;
     bool collided = false;
 
     private float posRewardApproachTarget = 0.03f;
     private float negRewardApproachTarget = -0.05f;
     private bool doUpdate = false;
-    private float posRewardPushTarget = 0.2f;
+    private float posRewardPushTarget = 0.5f;
     private float negRewardPushTarget = -0.5f;
-    FloatPropertiesChannel m_FloatProperties;
+
+
 
     public override void Initialize()
     {
@@ -123,34 +129,6 @@ public class ManipulatorAgent : Agent
             rewardForApproachingTarget();
             //rewardText.text = part6.transform.position[1].ToString("000000");
             //Debug.Log(part6.transform.position[1]);
-            if (part6.transform.position[1] - part1.transform.position[1] < 150)
-            {
-                AddReward(-5.0f);
-                EndEpisode();
-            }
-
-            if (part6.transform.position[1] - part1.transform.position[1] < 200)
-            {
-                AddReward(-1.0f);
-            }
-
-            if (part5.transform.position[1] - part1.transform.position[1]< 100)
-            {
-                AddReward(-5.0f);
-                EndEpisode();
-            }
-
-            if (part4.transform.position[1] - part1.transform.position[1]< 100)
-            {
-                AddReward(-5.0f);
-                EndEpisode();
-            }
-            if (part3.transform.position[1] - part1.transform.position[1] < 100)
-            {
-                AddReward(-5.0f);
-                EndEpisode();
-            }
-
             if (target1.transform.position[1] - part1.transform.position[1] < 50 && distTarget1ToZone < 850)
             {
                 AddReward(-100.0f);
@@ -180,6 +158,37 @@ public class ManipulatorAgent : Agent
                 AddReward(-100.0f);
                 EndEpisode();
             }
+
+            if (useTarget1 && target1.transform.position[1] >= lastHeight1 + 2 && target1.transform.position[1] < 800 && distTarget1ToZone < 850)
+            {
+                AddReward(0.3f);
+                lastHeight1 = target1.transform.position[1];
+            }
+
+            if (useTarget2 && target2.transform.position[1] >= lastHeight2 + 2 && target2.transform.position[1] < 800 && distTarget2ToZone < 850) 
+            {
+                AddReward(0.3f);
+                lastHeight2 = target2.transform.position[1];
+            }
+
+            if (useTarget3 && target3.transform.position[1] >= lastHeight3 + 2 && target3.transform.position[1] < 800 && distTarget3ToZone < 850)
+            {
+                AddReward(0.3f);
+                lastHeight3 = target3.transform.position[1];
+            }
+
+            if (useTarget4 && target4.transform.position[1] >= lastHeight4 + 2 && target4.transform.position[1] < 800 && distTarget4ToZone < 850)
+            {
+                AddReward(0.3f);
+                lastHeight4 = target4.transform.position[1];
+            }
+
+            if (useTarget5 && target5.transform.position[1] >= lastHeight5 + 2 && target5.transform.position[1] < 800 && distTarget5ToZone < 850 )
+            {
+                AddReward(0.3f);
+                lastHeight5 = target5.transform.position[1];
+            }
+
 
             if (lastDistTarget1ToZone > zone_radius &&
                 lastDistTarget2ToZone > zone_radius &&
@@ -427,7 +436,7 @@ public class ManipulatorAgent : Agent
                 y += actionSpeed;
                 break;
             case 2:
-                if (y > 500)
+                if (y > 550)
                 {
                 // y-
                     y -= actionSpeed;
@@ -469,7 +478,7 @@ public class ManipulatorAgent : Agent
                 throw new ArgumentException("Invalid action value");
         }
 
-        if (y < 500) y = 500;
+        if (y < 550) y = 550;
         //Debug.Log(x + " " + y + " " + z);
         // x = vectorAction[0] * 3000;
         // y = vectorAction[1] * 3000;
@@ -609,73 +618,80 @@ public class ManipulatorAgent : Agent
 
     public override void OnEpisodeBegin()
     {
+        lastHeight1 = 0;
+        lastHeight2 = 0;
+        lastHeight3 = 0;
+        lastHeight4 = 0;
+        lastHeight5 = 0;
+
+        float borderMargin = -200;
         // Border update
         Vector3 pos = b1.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b1.transform.position = pos;
 
         pos = b2.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b2.transform.position = pos;
 
         pos = b3.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b3.transform.position = pos;
 
         pos = b4.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b4.transform.position = pos;
 
         pos = b5.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b5.transform.position = pos;
 
         pos = b6.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b6.transform.position = pos;
 
         pos = b7.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b7.transform.position = pos;
 
         pos = b8.transform.position;
-        pos[1] = part1.transform.position[1];
+        pos[1] = part1.transform.position[1] + borderMargin;
         b8.transform.position = pos;
 
 
         collided = false;
         if (useCurricula)
         {
-            float phase = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("phase", 1);
-            //float phase = 5;
-            switch (phase)
-            {
-                case 1:
-                {
-                    useTarget1 = true;
-                    break;
-                }
-                case 2:
-                {
-                    useTarget2 = true;
-                    break;
-                }
-                case 3:
-                {
-                    useTarget3 = true;
-                    break;
-                }
-                case 4:
-                {
-                    useTarget4 = true;
-                    break;
-                }
-                case 5:
-                {
-                    useTarget5 = true;
-                    break;
-                }
-            }
+            // float phase = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("phase", 1);
+            // //float phase = 5;
+            // switch (phase)
+            // {
+            //     case 1:
+            //     {
+            //         useTarget1 = true;
+            //         break;
+            //     }
+            //     case 2:
+            //     {
+            //         useTarget2 = true;
+            //         break;
+            //     }
+            //     case 3:
+            //     {
+            //         useTarget3 = true;
+            //         break;
+            //     }
+            //     case 4:
+            //     {
+            //         useTarget4 = true;
+            //         break;
+            //     }
+            //     case 5:
+            //     {
+            //         useTarget5 = true;
+            //         break;
+            //     }
+            // }
         }
 
         Physics.gravity = new Vector3(0, -3000.0F, 0);
@@ -691,7 +707,7 @@ public class ManipulatorAgent : Agent
         float offset4 = 0;
         float offset5 = 0;
         
-        float margin = 110;
+        float margin = 400;
 
         float distanceFromZone = 500;
         if (useCurricula)
@@ -727,6 +743,7 @@ public class ManipulatorAgent : Agent
         //11111111111111111111111111
         float rad = 2 * (float) Math.PI * UnityEngine.Random.value;
         float dist = zone_radius - margin - UnityEngine.Random.value * distanceFromZone + offset1;
+
         if (useTarget1)
         {
 
@@ -762,7 +779,7 @@ public class ManipulatorAgent : Agent
             target2.transform.position = pos; 
             target2.transform.localRotation = Quaternion.identity; 
  
-            while (Vector3.Distance(target1.transform.position, target2.transform.position) < 220) 
+            while (Vector3.Distance(target1.transform.position, target2.transform.position) < 300) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
                 dist = zone_radius - margin - UnityEngine.Random.value * distanceFromZone + offset2; 
@@ -797,8 +814,8 @@ public class ManipulatorAgent : Agent
             target3.transform.position = pos; 
             target3.transform.localRotation = Quaternion.identity; 
  
-            while (Vector3.Distance(target1.transform.position, target3.transform.position) < 220 ||
-                   Vector3.Distance(target2.transform.position, target3.transform.position) < 220) 
+            while (Vector3.Distance(target1.transform.position, target3.transform.position) < 300 ||
+                   Vector3.Distance(target2.transform.position, target3.transform.position) < 300) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
                 dist = zone_radius - margin - UnityEngine.Random.value * distanceFromZone + offset3; 
@@ -832,9 +849,9 @@ public class ManipulatorAgent : Agent
             target4.transform.position = pos; 
             target4.transform.localRotation = Quaternion.identity; 
  
-            while (Vector3.Distance(target1.transform.position, target4.transform.position) < 220 ||
-                   Vector3.Distance(target2.transform.position, target4.transform.position) < 220 ||
-                   Vector3.Distance(target3.transform.position, target4.transform.position) < 220) 
+            while (Vector3.Distance(target1.transform.position, target4.transform.position) < 300 ||
+                   Vector3.Distance(target2.transform.position, target4.transform.position) < 300 ||
+                   Vector3.Distance(target3.transform.position, target4.transform.position) < 300) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
                 dist = zone_radius - margin - UnityEngine.Random.value * distanceFromZone + offset4; 
@@ -869,10 +886,10 @@ public class ManipulatorAgent : Agent
             target5.transform.position = pos; 
             target5.transform.localRotation = Quaternion.identity; 
  
-            while (Vector3.Distance(target1.transform.position, target5.transform.position) < 220 ||
-                   Vector3.Distance(target2.transform.position, target5.transform.position) < 220 ||
-                   Vector3.Distance(target3.transform.position, target5.transform.position) < 220 ||
-                   Vector3.Distance(target4.transform.position, target5.transform.position) < 220) 
+            while (Vector3.Distance(target1.transform.position, target5.transform.position) < 300 ||
+                   Vector3.Distance(target2.transform.position, target5.transform.position) < 300 ||
+                   Vector3.Distance(target3.transform.position, target5.transform.position) < 300 ||
+                   Vector3.Distance(target4.transform.position, target5.transform.position) < 300) 
             { 
                 rad = 2 * (float) Math.PI * UnityEngine.Random.value; 
                 dist = zone_radius - margin - UnityEngine.Random.value * distanceFromZone + offset5; 
