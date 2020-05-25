@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.SideChannels;
+using Unity.Barracuda;
 using TMPro;
 using System;
 using System.Threading;
@@ -707,12 +708,13 @@ public class ManipulatorAgent : Agent
         float offset4 = 0;
         float offset5 = 0;
         
-        float margin = 400;
+        float margin = 0;
 
         float distanceFromZone = 500;
         if (useCurricula)
         {
-            //distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+            distanceFromZone = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_from_zone", 0);
+
         } 
         
         
