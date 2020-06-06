@@ -8,7 +8,9 @@ using MLAgents.SideChannels;
 using TMPro;
 using System;
 using System.Threading;
-
+using UnityEditor;
+//using UnityEditor.Compilation;
+using System.Reflection;
 
 
 
@@ -70,8 +72,9 @@ public class ManipulatorAgent : Agent
     private bool useTarget5 = false;
     private bool useCurricula = true;
 
-    private float close_coeff2 = 1f;
-    private float close_coeff1 = 1f;
+    private float close_coeff1 = 0f;
+
+    private float closestTarget = 1; 
 
     bool collided = false;
 
@@ -83,7 +86,13 @@ public class ManipulatorAgent : Agent
     private float rewardForDroppingTarget = -1.0f;
     private float liftReward = 0.2f;
 
-
+    public static void ClearLog()
+    {
+        var assembly = Assembly.GetAssembly(typeof(UnityEditor.ActiveEditorTracker));
+        var type = assembly.GetType("UnityEditorInternal.LogEntries");
+        var method = type.GetMethod("Clear");
+        method.Invoke(new object(), null);
+    }
 
     public override void Initialize()
     {
@@ -113,15 +122,37 @@ public class ManipulatorAgent : Agent
             distTarget4ToZone = flatDistance(target4.transform.position, zone.transform.position);
             distTarget5ToZone = flatDistance(target5.transform.position, zone.transform.position);
             
-            lastDistTarget1ToZone = rewardForPushingTargetFromZone(distTarget1ToZone, lastDistTarget1ToZone, target1.transform.position[1]);
-            lastDistTarget2ToZone = rewardForPushingTargetFromZone(distTarget2ToZone, lastDistTarget2ToZone, target2.transform.position[1]);
-            lastDistTarget3ToZone = rewardForPushingTargetFromZone(distTarget3ToZone, lastDistTarget3ToZone, target3.transform.position[1]);
-            lastDistTarget4ToZone = rewardForPushingTargetFromZone(distTarget4ToZone, lastDistTarget4ToZone, target4.transform.position[1]);
-            lastDistTarget5ToZone = rewardForPushingTargetFromZone(distTarget5ToZone, lastDistTarget5ToZone, target5.transform.position[1]);
+            switch(closestTarget)
+            {
+                case 1:
+                    lastDistEndEffectorToTarget1 = rewardForApproachingTarget(distEndEffectorToTarget1, lastDistEndEffectorToTarget1);
+                    lastDistTarget1ToZone = rewardForPushingTargetFromZone(distTarget1ToZone, lastDistTarget1ToZone, target1.transform.position[1]);
+                    break;
 
-            rewardForApproachingTarget();
+                case 2:
+                    lastDistEndEffectorToTarget2 = rewardForApproachingTarget(distEndEffectorToTarget2, lastDistEndEffectorToTarget2);
+                    lastDistTarget2ToZone = rewardForPushingTargetFromZone(distTarget2ToZone, lastDistTarget2ToZone, target2.transform.position[1]);
+                    break;
+
+                case 3:
+                    lastDistEndEffectorToTarget3 = rewardForApproachingTarget(distEndEffectorToTarget3, lastDistEndEffectorToTarget3);
+                    lastDistTarget3ToZone = rewardForPushingTargetFromZone(distTarget3ToZone, lastDistTarget3ToZone, target3.transform.position[1]);
+                    break;
+
+                case 4:
+                    lastDistEndEffectorToTarget4 = rewardForApproachingTarget(distEndEffectorToTarget4, lastDistEndEffectorToTarget4);
+                    lastDistTarget4ToZone = rewardForPushingTargetFromZone(distTarget4ToZone, lastDistTarget4ToZone, target4.transform.position[1]);
+                    break;
+
+                case 5:
+                    lastDistEndEffectorToTarget5 = rewardForApproachingTarget(distEndEffectorToTarget5, lastDistEndEffectorToTarget5);
+                    lastDistTarget5ToZone = rewardForPushingTargetFromZone(distTarget5ToZone, lastDistTarget5ToZone, target5.transform.position[1]);
+                    break;
+            }
             //rewardText.text = part6.transform.position[1].ToString("000000");
             //Debug.Log(part6.transform.position[1]);
+
+            // REWARD FOR DROPPING OBJECTS IN ZONE
             if (target1.transform.position[1] - part1.transform.position[1] < 50 && distTarget1ToZone < zone_radius)
             {
                 AddReward(rewardForDroppingTarget);
@@ -152,31 +183,33 @@ public class ManipulatorAgent : Agent
                 EndEpisode();
             }
 
-            if (useTarget1 && target1.transform.position[1] > lastHeight1 && target1.transform.position[1] < 800 && distTarget1ToZone < zone_radius)
+            // REWARD FOR LIFTING OBJECTS
+            if (useTarget1 && target1.transform.position[1] > lastHeight1 && lastHeight1 < 500 && distTarget1ToZone < zone_radius)
             {
                 AddReward(liftReward);
                 lastHeight1 = target1.transform.position[1];
+                //Debug.Log("reward for lifting object");
             }
 
-            if (useTarget2 && target2.transform.position[1] > lastHeight2 && target2.transform.position[1] < 800 && distTarget2ToZone < zone_radius) 
+            if (useTarget2 && target2.transform.position[1] > lastHeight2 && lastHeight2 < 500 && distTarget2ToZone < zone_radius) 
             {
                 AddReward(liftReward);
                 lastHeight2 = target2.transform.position[1];
             }
 
-            if (useTarget3 && target3.transform.position[1] > lastHeight3 && target3.transform.position[1] < 800 && distTarget3ToZone < zone_radius)
+            if (useTarget3 && target3.transform.position[1] > lastHeight3 && lastHeight3 < 500 && distTarget3ToZone < zone_radius)
             {
                 AddReward(liftReward);
                 lastHeight3 = target3.transform.position[1];
             }
 
-            if (useTarget4 && target4.transform.position[1] > lastHeight4 && target4.transform.position[1] < 800 && distTarget4ToZone < zone_radius)
+            if (useTarget4 && target4.transform.position[1] > lastHeight4 && lastHeight4 < 500 && distTarget4ToZone < zone_radius)
             {
                 AddReward(liftReward);
                 lastHeight4 = target4.transform.position[1];
             }
 
-            if (useTarget5 && target5.transform.position[1] > lastHeight5 && target5.transform.position[1] < 800 && distTarget5ToZone < zone_radius )
+            if (useTarget5 && target5.transform.position[1] > lastHeight5 && lastHeight5 < 500 && distTarget5ToZone < zone_radius )
             {
                 AddReward(liftReward);
                 lastHeight5 = target5.transform.position[1];
@@ -189,11 +222,11 @@ public class ManipulatorAgent : Agent
             //     EndEpisode();
             // }
 
-            if (lastDistTarget1ToZone > zone_radius &&
-                lastDistTarget2ToZone > zone_radius &&
-                lastDistTarget3ToZone > zone_radius &&
-                lastDistTarget4ToZone > zone_radius &&
-                lastDistTarget5ToZone > zone_radius)
+            if (lastDistTarget1ToZone > zone_radius && target1.transform.position[1] < 0 &&
+                lastDistTarget2ToZone > zone_radius && target2.transform.position[1] < 0 &&
+                lastDistTarget3ToZone > zone_radius && target3.transform.position[1] < 0 &&
+                lastDistTarget4ToZone > zone_radius && target4.transform.position[1] < 0 &&
+                lastDistTarget5ToZone > zone_radius && target5.transform.position[1] < 0)
             {
                 AddReward(1.0f);
                 EndEpisode();
@@ -252,59 +285,45 @@ public class ManipulatorAgent : Agent
     {
         if (distTargetToZone < zone_radius)
         {
-            if (distTargetToZone > lastDistTargetToZone + 1 /*&& height > 500*/)
+            if (distTargetToZone > lastDistTargetToZone + 1  && lastDistTargetToZone < zone_radius /*&& height > 500*/)
             {
-                AddReward(posRewardPushTarget * distTargetToZone / zone_radius);
+                AddReward(posRewardPushTarget);
+                //Debug.Log("Pushing object");
+                lastDistTargetToZone = distTargetToZone;
             }
             else if (distTargetToZone < lastDistTargetToZone - 1)
             {
                 AddReward(negRewardPushTarget);
             }
-            lastDistTargetToZone = distTargetToZone;
         }
-        else if (lastDistTargetToZone < zone_radius)
+        else if (lastDistTargetToZone < zone_radius && height < 50)
         {
             AddReward(1.0f);
             lastDistTargetToZone = distTargetToZone;
         }
+
         return lastDistTargetToZone;
     }
 
-    private void rewardForApproachingTarget()
+    private float rewardForApproachingTarget(float distEndEffectorToTarget, float lastDistEndEffectorToTarget)
     {
         //Debug.Log("distTarget1ToZone = " + distTarget1ToZone);
         //Debug.Log("distEndEffectorToTarget1 = " + distEndEffectorToTarget1);
         //Debug.Log("lastDistEndEffectorToTarget1 = " + lastDistEndEffectorToTarget1);
-        if (distTarget1ToZone < zone_radius && distEndEffectorToTarget1 < lastDistEndEffectorToTarget1 - 1)
+
+
+        if (distEndEffectorToTarget < zone_radius)
         {
-            AddReward(posRewardApproachTarget);
+            if (distEndEffectorToTarget < lastDistEndEffectorToTarget - 1)
+            {
+                AddReward(posRewardApproachTarget);
+            }
+            else if (distEndEffectorToTarget > lastDistEndEffectorToTarget)
+            {
+                AddReward(negRewardApproachTarget);
+            }
         }
-        else if (distTarget2ToZone < zone_radius && distEndEffectorToTarget2 < lastDistEndEffectorToTarget2 - 1)
-        {
-            AddReward(posRewardApproachTarget);
-        }
-        else if (distTarget3ToZone < zone_radius && distEndEffectorToTarget3 < lastDistEndEffectorToTarget3 - 1)
-        {
-            AddReward(posRewardApproachTarget);
-        }
-        else if (distTarget4ToZone < zone_radius && distEndEffectorToTarget4 < lastDistEndEffectorToTarget4 - 1)
-        {
-            AddReward(posRewardApproachTarget);
-        }
-        else if (distTarget5ToZone < zone_radius && distEndEffectorToTarget5 < lastDistEndEffectorToTarget5 - 1)
-        {
-            AddReward(posRewardApproachTarget);
-        }
-        else
-        {
-            //Debug.Log("Negative reward for not approaching target");
-            AddReward(negRewardApproachTarget);
-        }
-        lastDistEndEffectorToTarget1 = distEndEffectorToTarget1;
-        lastDistEndEffectorToTarget2 = distEndEffectorToTarget2;
-        lastDistEndEffectorToTarget3 = distEndEffectorToTarget3;
-        lastDistEndEffectorToTarget4 = distEndEffectorToTarget4;
-        lastDistEndEffectorToTarget5 = distEndEffectorToTarget5;
+        return distEndEffectorToTarget;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -336,38 +355,40 @@ public class ManipulatorAgent : Agent
                                          target5.transform.position[1] - part1.transform.position[1], 
                                          target5.transform.position[2] - part1.transform.position[2]); 
  
-        float closestTarget = 1; 
+
         float minDistance = 100000; 
-        if (distEndEffectorToTarget1 < minDistance && distTarget1ToZone < zone_radius) 
+        if (distEndEffectorToTarget1 < minDistance && lastDistTarget1ToZone < zone_radius && useTarget1) 
         { 
             minDistance = distEndEffectorToTarget1; 
             closestTarget = 1; 
         } 
  
-        if (distEndEffectorToTarget2 < minDistance  && distTarget2ToZone < zone_radius) 
+        if (distEndEffectorToTarget2 < minDistance  && lastDistTarget2ToZone < zone_radius && useTarget2) 
         { 
             minDistance = distEndEffectorToTarget2; 
             closestTarget = 2; 
         } 
  
-        if (distEndEffectorToTarget3 < minDistance  && distTarget3ToZone < zone_radius) 
+        if (distEndEffectorToTarget3 < minDistance  && lastDistTarget3ToZone < zone_radius && useTarget3) 
         { 
             minDistance = distEndEffectorToTarget3; 
             closestTarget = 3; 
         } 
  
-        if (distEndEffectorToTarget4 < minDistance  && distTarget4ToZone < zone_radius) 
+        if (distEndEffectorToTarget4 < minDistance  && lastDistTarget4ToZone < zone_radius && useTarget4) 
         { 
             minDistance = distEndEffectorToTarget4; 
             closestTarget = 4; 
         } 
  
-        if (distEndEffectorToTarget5 < minDistance  && distTarget5ToZone < zone_radius) 
+        if (distEndEffectorToTarget5 < minDistance  && lastDistTarget5ToZone < zone_radius && useTarget5) 
         { 
             minDistance = distEndEffectorToTarget5; 
             closestTarget = 5; 
         } 
- 
+        //ClearLog();
+        Debug.ClearDeveloperConsole();
+        Debug.Log("target: " + closestTarget);
         switch(closestTarget) 
         { 
             case 1: 
@@ -701,6 +722,18 @@ public class ManipulatorAgent : Agent
         lastHeight4 = 0;
         lastHeight5 = 0;
 
+        lastDistTarget1ToZone = 0;
+        lastDistTarget2ToZone = 0;
+        lastDistTarget3ToZone = 0;
+        lastDistTarget4ToZone = 0;
+        lastDistTarget5ToZone = 0;
+
+        lastDistEndEffectorToTarget1 = 10000;
+        lastDistEndEffectorToTarget2 = 10000;
+        lastDistEndEffectorToTarget3 = 10000;
+        lastDistEndEffectorToTarget4 = 10000;
+        lastDistEndEffectorToTarget5 = 10000;
+
         float borderMargin = -100;
         // Border update
         // Vector3 pos = b1.transform.position;
@@ -769,7 +802,7 @@ public class ManipulatorAgent : Agent
             // }
         }
 
-        Physics.gravity = new Vector3(0, -3000.0F, 0);
+        Physics.gravity = new Vector3(0, -6000.0F, 0);
         // float offset1 = 200;
         // float offset2 = 200;
         // float offset3 = 200;
@@ -787,6 +820,7 @@ public class ManipulatorAgent : Agent
         float plane_margin = -200;
         float distanceLow = 0;
         float distanceHigh = 450;
+        float targets = 1.0f;
         //float close_coeff1 = 0f;
         //close_coeff2 = 0.1f;
         
@@ -797,7 +831,7 @@ public class ManipulatorAgent : Agent
         {
             //distanceLow =  (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_low", 0);
             //distanceHigh =  (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("distance_high", 450);
-            close_coeff1 = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff1", 1.0f);
+            close_coeff1 = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff1", 0.0f);
             targets = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("targets", 1.0f);
             //close_coeff2 = (float) Academy.Instance.FloatProperties.GetPropertyWithDefault("close_coeff2", 1.0f);
         }
@@ -993,7 +1027,7 @@ public class ManipulatorAgent : Agent
 
         float default_x = part1.transform.position[0] + 1300;
         float default_z = part1.transform.position[2];
-        float default_y = part1.transform.position[1] + 1000;
+        float default_y = part1.transform.position[1] + 800;
 
         float dx = tx - default_x;
         float dy = ty - default_y;
