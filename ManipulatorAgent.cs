@@ -25,6 +25,8 @@ public class ManipulatorAgent : Agent
     public TextMeshPro rewardText;
     public float actionSpeed = 10.0f;
     public float speed;
+    private float part1_min = -70;
+    private float part1_max = 70;
     public float part2_min =  0;
     public float part2_max =  90;
     public float part3_min = -150;
@@ -34,6 +36,8 @@ public class ManipulatorAgent : Agent
     public float end_min = -5;
     public float end_max =  40;
     public float zone_radius = 650;
+
+    private int steps = 0;
 
     private float lastDistTarget1ToZone = 1000000;
     private float lastDistTarget2ToZone = 1000000;
@@ -66,11 +70,11 @@ public class ManipulatorAgent : Agent
     private float distTarget5ToZone;
 
     private bool useTarget1 = true;
-    private bool useTarget2 = false;
-    private bool useTarget3 = false;
-    private bool useTarget4 = false;
-    private bool useTarget5 = false;
-    private bool useCurricula = true;
+    private bool useTarget2 = true;
+    private bool useTarget3 = true;
+    private bool useTarget4 = true;
+    private bool useTarget5 = true;
+    private bool useCurricula = false;  
 
     private float close_coeff1 = 0f;
 
@@ -78,8 +82,8 @@ public class ManipulatorAgent : Agent
 
     bool collided = false;
 
-    private float posRewardApproachTarget = 0.05f;
-    private float negRewardApproachTarget = -0.05f;
+    private float posRewardApproachTarget = 0.1f;
+    private float negRewardApproachTarget = -0.1f;
     private bool doUpdate = false;
     private float posRewardPushTarget = 0.1f;
     private float negRewardPushTarget = -0.1f;
@@ -125,28 +129,33 @@ public class ManipulatorAgent : Agent
             switch(closestTarget)
             {
                 case 1:
-                    lastDistEndEffectorToTarget1 = rewardForApproachingTarget(distEndEffectorToTarget1, lastDistEndEffectorToTarget1);
                     lastDistTarget1ToZone = rewardForPushingTargetFromZone(distTarget1ToZone, lastDistTarget1ToZone, target1.transform.position[1]);
+                    lastDistEndEffectorToTarget1 = rewardForApproachingTarget(distEndEffectorToTarget1, lastDistEndEffectorToTarget1, lastDistTarget1ToZone);
+
                     break;
 
                 case 2:
-                    lastDistEndEffectorToTarget2 = rewardForApproachingTarget(distEndEffectorToTarget2, lastDistEndEffectorToTarget2);
                     lastDistTarget2ToZone = rewardForPushingTargetFromZone(distTarget2ToZone, lastDistTarget2ToZone, target2.transform.position[1]);
+                    lastDistEndEffectorToTarget2 = rewardForApproachingTarget(distEndEffectorToTarget2, lastDistEndEffectorToTarget2, lastDistTarget2ToZone);
+
                     break;
 
                 case 3:
-                    lastDistEndEffectorToTarget3 = rewardForApproachingTarget(distEndEffectorToTarget3, lastDistEndEffectorToTarget3);
                     lastDistTarget3ToZone = rewardForPushingTargetFromZone(distTarget3ToZone, lastDistTarget3ToZone, target3.transform.position[1]);
+                    lastDistEndEffectorToTarget3 = rewardForApproachingTarget(distEndEffectorToTarget3, lastDistEndEffectorToTarget3, lastDistTarget3ToZone);
+
                     break;
 
                 case 4:
-                    lastDistEndEffectorToTarget4 = rewardForApproachingTarget(distEndEffectorToTarget4, lastDistEndEffectorToTarget4);
                     lastDistTarget4ToZone = rewardForPushingTargetFromZone(distTarget4ToZone, lastDistTarget4ToZone, target4.transform.position[1]);
+                    lastDistEndEffectorToTarget4 = rewardForApproachingTarget(distEndEffectorToTarget4, lastDistEndEffectorToTarget4, lastDistTarget4ToZone);
+
                     break;
 
                 case 5:
-                    lastDistEndEffectorToTarget5 = rewardForApproachingTarget(distEndEffectorToTarget5, lastDistEndEffectorToTarget5);
                     lastDistTarget5ToZone = rewardForPushingTargetFromZone(distTarget5ToZone, lastDistTarget5ToZone, target5.transform.position[1]);
+                    lastDistEndEffectorToTarget5 = rewardForApproachingTarget(distEndEffectorToTarget5, lastDistEndEffectorToTarget5, lastDistTarget5ToZone);
+
                     break;
             }
             //rewardText.text = part6.transform.position[1].ToString("000000");
@@ -221,13 +230,16 @@ public class ManipulatorAgent : Agent
             //     AddReward(1.0f);
             //     EndEpisode();
             // }
-
-            if (lastDistTarget1ToZone > zone_radius && target1.transform.position[1] < 0 &&
-                lastDistTarget2ToZone > zone_radius && target2.transform.position[1] < 0 &&
-                lastDistTarget3ToZone > zone_radius && target3.transform.position[1] < 0 &&
-                lastDistTarget4ToZone > zone_radius && target4.transform.position[1] < 0 &&
-                lastDistTarget5ToZone > zone_radius && target5.transform.position[1] < 0)
+            //if (lastDistTarget1ToZone >= zone_radius) Debug.Log("lastDistTarget1ToZone: " + lastDistTarget1ToZone);
+            //if (lastDistTarget1ToZone >= zone_radius) Debug.Log("lastDistTarget2ToZone: " + lastDistTarget2ToZone);
+            if (lastDistTarget1ToZone >= zone_radius && target1.transform.position[1] < 0 &&
+                lastDistTarget2ToZone >= zone_radius && target2.transform.position[1] < 0 &&
+                lastDistTarget3ToZone >= zone_radius && target3.transform.position[1] < 0 &&
+                lastDistTarget4ToZone >= zone_radius && target4.transform.position[1] < 0 &&
+                lastDistTarget5ToZone >= zone_radius && target5.transform.position[1] < 0)
             {
+                Debug.Log("steps: " + steps);
+                steps = 0;
                 AddReward(1.0f);
                 EndEpisode();
             }
@@ -301,18 +313,19 @@ public class ManipulatorAgent : Agent
             AddReward(1.0f);
             lastDistTargetToZone = distTargetToZone;
         }
+        else if (height > 50) AddReward(-0.03f);
 
         return lastDistTargetToZone;
     }
 
-    private float rewardForApproachingTarget(float distEndEffectorToTarget, float lastDistEndEffectorToTarget)
+    private float rewardForApproachingTarget(float distEndEffectorToTarget, float lastDistEndEffectorToTarget, float distTargetToZone)
     {
         //Debug.Log("distTarget1ToZone = " + distTarget1ToZone);
         //Debug.Log("distEndEffectorToTarget1 = " + distEndEffectorToTarget1);
         //Debug.Log("lastDistEndEffectorToTarget1 = " + lastDistEndEffectorToTarget1);
 
 
-        if (distEndEffectorToTarget < zone_radius)
+        if (distTargetToZone < zone_radius)
         {
             if (distEndEffectorToTarget < lastDistEndEffectorToTarget - 1)
             {
@@ -387,8 +400,8 @@ public class ManipulatorAgent : Agent
             closestTarget = 5; 
         } 
         //ClearLog();
-        Debug.ClearDeveloperConsole();
-        Debug.Log("target: " + closestTarget);
+        //Debug.ClearDeveloperConsole();
+        //Debug.Log("target: " + closestTarget);
         switch(closestTarget) 
         { 
             case 1: 
@@ -486,6 +499,7 @@ public class ManipulatorAgent : Agent
     public override void OnActionReceived(float[] vectorAction)
     {
         doUpdate = true;
+        steps += 1;
         //Debug.Log("On action received");
         if (float.IsNaN(vectorAction[0])
             //float.IsNaN(vectorAction[1])||
@@ -577,6 +591,17 @@ public class ManipulatorAgent : Agent
         }
 
         if (y < 550) y = 550;
+        if (y > 1000) y = 1000;
+        if (x > 1900) x = 1900;
+        if (x < 800)  x = 800;
+        float kx = x - 1300;
+
+
+        
+        float rz = (float) Math.Sqrt(1300000 - Math.Pow(kx, 2));
+
+        if (z > rz) z = rz;
+        else if (z < -rz) z = -rz;
         //Debug.Log(x + " " + y + " " + z);
         // x = vectorAction[0] * 3000;
         // y = vectorAction[1] * 3000;
@@ -618,6 +643,15 @@ public class ManipulatorAgent : Agent
             float target_phi5 = radToDegree(angles[4]);
             float target_phi6 = radToDegree(angles[5]);
             // check limits
+            if (target_phi1 > part1_max)
+            {
+                target_phi1 = part1_max;
+            }
+            else if (target_phi1 < part1_min)
+            {
+                target_phi1 = part1_min;
+            } 
+
             if (target_phi2 > part2_max)
             {
                 target_phi2 = part2_max;
@@ -722,11 +756,20 @@ public class ManipulatorAgent : Agent
         lastHeight4 = 0;
         lastHeight5 = 0;
 
-        lastDistTarget1ToZone = 0;
-        lastDistTarget2ToZone = 0;
-        lastDistTarget3ToZone = 0;
-        lastDistTarget4ToZone = 0;
-        lastDistTarget5ToZone = 0;
+        if (useTarget1) lastDistTarget1ToZone = 0;
+        else lastDistTarget1ToZone = 2000;
+
+        if (useTarget2) lastDistTarget2ToZone = 0;
+        else lastDistTarget2ToZone = 2000;
+
+        if (useTarget3) lastDistTarget3ToZone = 0;
+        else lastDistTarget3ToZone = 2000;
+
+        if (useTarget4) lastDistTarget4ToZone = 0;
+        else lastDistTarget4ToZone = 2000;
+
+        if (useTarget5) lastDistTarget5ToZone = 0;
+        else lastDistTarget5ToZone = 2000;
 
         lastDistEndEffectorToTarget1 = 10000;
         lastDistEndEffectorToTarget2 = 10000;
@@ -734,7 +777,7 @@ public class ManipulatorAgent : Agent
         lastDistEndEffectorToTarget4 = 10000;
         lastDistEndEffectorToTarget5 = 10000;
 
-        float borderMargin = -100;
+        float borderMargin = -200;
         // Border update
         // Vector3 pos = b1.transform.position;
         // pos[1] = part1.transform.position[1] + borderMargin;
